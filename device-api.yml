@@ -1,0 +1,1113 @@
+openapi: 3.0.2
+info:
+  title: Device APIs
+  version: "1.0"
+  description: "Please note that to access these APIs, two headers needs to be included in the request. Both of this headers are described below"
+servers:
+  - url: https://device.{region}.anedya.io
+    description: Anedya Device Endpoint
+    variables:
+      region:
+        default: ap-in-1
+        enum:
+          - ap-in-1
+paths:
+  /v1/submitData:
+    post:
+      summary: Submit Data to Anedya
+      operationId: submitdata
+      tags:
+        - Operations
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+      description: |-
+        Devices can submit the data to this endpoint. You need to specify the authentication mode you want to use to access APIs by setting `Auth-mode` header.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/submitdata/json
+        ```
+
+      security:
+        - Auth-mode: []
+          Authorization: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      variable:
+                        type: string
+                        description: Variable identifier specified during variable creation
+                      value:
+                        description: "Depending on the type of variable, `value` can be a number or a JSON object. For example, for `float` variables it will be number."
+                        oneOf:
+                          - type: object
+                            properties:
+                              lat:
+                                type: number
+                                description: Lattitude in Decimal Degrees
+                                minimum: -90
+                                maximum: 90
+                              long:
+                                type: number
+                                description: Longitude in decimal degrees
+                                minimum: -180
+                                maximum: 180
+                          - type: number
+                            description: Float value, applicable only for float variables. NaN is not allowed.
+                          - type: string
+                            description: String value, applicable only for status variables.
+                            maxLength: 50
+                            minLength: 1
+                      timestamp:
+                        type: integer
+                        description: "`0` passed as timestamp value will be replaced by current timestamp during processing"
+                    minProperties: 1
+              required:
+                - data
+            examples:
+              Float Value:
+                value:
+                  data:
+                    - variable: variable-identifier
+                      value: 123.456
+                      timestamp: 1714392140000
+              Geo-coordinate Value:
+                value:
+                  data:
+                    - variable: variable-identifier
+                      value:
+                        lat: 23
+                        long: 72.1
+                      timestamp: 1714392140000
+              Status Value:
+                value:
+                  data:
+                    - variable: variable-identifier
+                      value: "status-string"
+                      timestamp: 1714392140000
+  /v1/gateway/submitData:
+    post:
+      summary: Submit Data to Anedya through a Gateway
+      operationId: gatewaydata
+      tags:
+        - Operations
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+      description: |-
+        The devices acting as a gateway can submit the data to this endpoint for its child nodes. The child nodes need to be registered with the platform prior to data submission.
+        Please note that the parent gateway needs to be present as a node and should be in binded status for this API to work.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/gateway/submitdata/json
+        ```
+
+      security:
+        - Auth-mode: []
+          Authorization: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                childAlias:
+                  type: string
+                  description: Alias of the child node as registered with the platform
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      variable:
+                        type: string
+                        description: Variable identifier specified during variable creation
+                      value:
+                        description: "Depending on the type of variable, `value` can be a number or a JSON object. For example, for `float` variables it will be number."
+                        oneOf:
+                          - type: object
+                            properties:
+                              lat:
+                                type: number
+                                description: Lattitude in Decimal Degrees
+                                minimum: -90
+                                maximum: 90
+                              long:
+                                type: number
+                                description: Longitude in decimal degrees
+                                minimum: -180
+                                maximum: 180
+                          - type: number
+                            description: Float value, applicable only for float variables. NaN is not allowed.
+                          - type: string
+                            description: String value, applicable only for status variables.
+                            maxLength: 50
+                            minLength: 1
+                      timestamp:
+                        type: integer
+                        description: "`0` passed as timestamp value will be replaced by current timestamp during processing"
+                    minProperties: 1
+              required:
+                - childAlias
+                - data
+            examples:
+              Float Value:
+                value:
+                  data:
+                    - variable: variable-identifier
+                      value: 123.456
+                      timestamp: 1714392140000
+              Geo-coordinate Value:
+                value:
+                  data:
+                    - variable: variable-identifier
+                      value:
+                        lat: 23
+                        long: 72.1
+                      timestamp: 1714392140000
+              Status Value:
+                value:
+                  data:
+                    - variable: variable-identifier
+                      value: "status-string"
+                      timestamp: 1714392140000
+  /v1/bindDevice:
+    post:
+      summary: Bind Device
+      operationId: binddevice
+      description: |-
+        This API endpoint is used to bind your device with the platform. When a new device unknown to Anedya Platform tries to connect with the platform,
+        it needs to register itself through binding process. In which a unique binding key needs to be passed along with connection key as an additional
+        layer of security. The binding key is one time use only and it changes once a particular device bind and can not be reused.
+
+        The same action can also be performed through MQTT.
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceID}/bindDevice/json
+        ```
+      tags:
+        - Device Lifecycle
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    x-stoplight:
+                      id: 6leme8hol8v66
+                  error:
+                    type: string
+                    x-stoplight:
+                      id: mgs1y368dex27
+                  errcode:
+                    type: integer
+                    x-stoplight:
+                      id: oav5z1x4thep4
+      x-stoplight:
+        id: gzmagbt931v6v
+      security:
+        - Auth-mode: []
+          Authorization: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceid:
+                  type: string
+                  x-stoplight:
+                    id: 7j7yso4old1wa
+                  description: 128-bit UUID of the physical device. UUID should not change throughout lifetime of the device.
+                bindingsecret:
+                  type: string
+                  description: Binding Secret for the Node
+              required:
+                - deviceid
+                - bindingsecret
+  /v1/check:
+    get:
+      summary: Check Device Connectivity
+      tags:
+        - Operations
+      operationId: check
+      responses:
+        "200":
+          description: API returns 200 OK if the device is authenticated successfully
+      x-stoplight:
+        id: fxmzp76xo9byb
+      description: |-
+        This API endpoint can be used to check the device connectivity. The API will simply return 200 OK Status if your device is authorized, binded and is allowed to connect
+        with the Platform.
+
+      security:
+        - Auth-mode: []
+          Authorization: []
+  /v1/time:
+    post:
+      summary: HTTP Time Synchronization API
+      description: |-
+        This method provides a simple HTTPS based time Synchronization API.
+        The API will return the time synchronization information which can be used to correct system time of device. It does not
+        provide accuracy as high as NTP protocol but it is much simpler to implement. If your application does not demand millisecond accurate
+        time measurement, you can use this API to achieve time synchronization with accuracy of +/- 200 ms with respect to Anedya's Time Servers.
+        This API can be used as following:
+        - First Device needs to measure current time as per internal system clock and convert it to Unix millisecond timestamp.
+        - Device sends this timestamp in a HTTPS POST request with minimal processing delay
+        - The server responds with three parameters: Device Send Time, Server Receive Time and Server Send Time. At the same time device also records the timestamp at which the response is received.
+        - The exact current time can be calculated by using following equation:
+          ```
+          current_time = (Server Receive Time + Server Send Time + Device Recieve Time - Device Send Time)/2
+          ```
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/time/json
+        ```
+
+        To know more about time synchronization, please refer to [Anedya Time Services](https://docs.anedya.io/essentials/hardware-checklist/#time)
+      tags:
+        - Operations
+      operationId: http-time-sync
+      responses:
+        "200":
+          description: API returns the response with Time Synchronization information which can be used to correct system of device
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deviceSendTime:
+                    type: integer
+                    description: Device Send Time
+                  serverReceiveTime:
+                    type: integer
+                    description: Server Receive Time
+                  serverSendTime:
+                    type: integer
+                    description: Server Send Time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceSendTime:
+                  type: integer
+                  description: Device Send Time as per the system clock of the device
+  /v1/valuestore/getValue:
+    post:
+      tags:
+        - ValueStore
+      summary: Get a Value
+      description: |-
+        Get a value from the valuestore.
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/valuestore/getValue/json
+        ```
+
+      operationId: valuestore-getValue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                namespace:
+                  type: object
+                  properties:
+                    scope:
+                      type: string
+                      enum:
+                        - global
+                        - self
+                    id:
+                      type: string
+                  required:
+                    - scope
+                key:
+                  type: string
+              required:
+                - namespace
+                - key
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+                  namespace:
+                    type: object
+                    properties:
+                      scope:
+                        type: string
+                        enum:
+                          - global
+                          - self
+                      id:
+                        type: string
+                  key:
+                    type: string
+                  value:
+                    oneOf:
+                      - type: string
+                      - type: boolean
+                      - type: number
+                  type:
+                    type: string
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/valuestore/setValue:
+    post:
+      tags:
+        - ValueStore
+      summary: Set a Value
+      description: |-
+        This endpoint allows to set a key value pair. If key exists it is updated and if not new key-value pair is created.
+
+        :::note
+        Devices can set values only in `self` namespace
+        :::
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/valuestore/setValue/json
+        ```
+
+      operationId: valuestore-setValue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                key:
+                  type: string
+                  description: A unique key to identify your key value pair
+                value:
+                  description: Value to be set for the key
+                  oneOf:
+                    - type: string
+                    - type: boolean
+                    - type: number
+                type:
+                  type: string
+                  enum:
+                    - string
+                    - float
+                    - binary
+                    - boolean
+                  description: |-
+                    Type of the value needs to be set. This type will override
+                    type specified earlier.
+              required:
+                - key
+                - value
+                - type
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/valuestore/scan:
+    post:
+      tags:
+        - ValueStore
+      summary: Scan and List all keys
+      description: |-
+        This API lists all keys in devices `self` namespace.
+        :::note
+        Please note that `global` namespace keys can not be listed by devices. This allows you to keep certain Global Namespaces to secret from the device you don't want
+        to share data with.
+        :::
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/valuestore/scan/json
+        ```
+
+      operationId: valuestore-scan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  keys:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        type:
+                          type: string
+                  count:
+                    type: integer
+                  next:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/valuestore/delete:
+    post:
+      tags:
+        - ValueStore
+      summary: Delete a Key-Value Pair
+      description: |-
+        Deletes a Key-Value pair
+
+        :::note
+        Devices can delete a key value pair from `self` namespace only.
+        :::
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/valuestore/delete/json
+        ```
+      operationId: valuestore-delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                key:
+                  type: string
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/logs/submitLogs:
+    post:
+      tags:
+        - Device Logs
+      summary: Submit device log to Anedya Cloud
+      description: |-
+        Submit device logs to the platform. In single API request, you can submit max 100 log entries.
+        :::note
+        Each log entry can have a maximum of 1000 characters.
+        :::
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/logs/submitLogs/json
+        ```
+      operationId: logs-submitLogs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                data:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    type: object
+                    properties:
+                      timestamp:
+                        type: integer
+                        description: Unix epoch in millisecond format. Passing `0` in the timestamp will instruct platform to use current UTC time.
+                      log:
+                        type: string
+                        description: Log entry. Max 1000 characters per entry
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+  /v1/commands/next:
+    post:
+      tags:
+        - Commands
+      summary: Get next command
+      description: |
+        Get the next command from the platform. Platform returns one command at a time in the ascending order of creation time.
+        This API is usefull when in-order command execution is required, i.e. commands needs to be executed in the same order in which they were issued.
+
+        :::note
+        The API will return same command on each call until that command is acknowledged to state `received` and above
+        :::
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/commands/next/json
+        ```
+      operationId: commands-next
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqID:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  commandId:
+                    type: string
+                  command:
+                    type: string
+                  data:
+                    type: string
+                  datatype:
+                    type: string
+                    enum:
+                      - string
+                      - binary
+                  issued:
+                    type: integer
+                  nextavailable:
+                    type: boolean
+                    description: |
+                      This value is set to `true` if there is an additional command in the queue.
+                  status:
+                    type: string
+                  updated:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/commands/list:
+    post:
+      tags:
+        - Commands
+      summary: List all queued commands
+      description: |
+        This API allows devices to fetch the list of commands if out of order execution or parallel execution of multiple commands is required.
+        Please note that changing status of a command received from list API may change the output of `next` API
+        List API returns the command list in the ascending order of creation.
+
+        :::note
+        The list API returns commands with following status only: `pending`, `received`, `processing`. Commands with any
+        other status is considered as concluded
+        :::
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/commands/list/json
+        ```
+
+      operationId: commands-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+                  commands:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        commandId:
+                          type: string
+                        command:
+                          type: string
+                        status:
+                          type: string
+                          enum:
+                            - pending
+                            - received
+                            - processing
+                        issuedAt:
+                          type: integer
+                        updated:
+                          type: integer
+                  count:
+                    type: integer
+                  next:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/commands/updateStatus:
+    post:
+      tags:
+        - Commands
+      summary: Update status of a command
+      description: |
+        Updates the status of a command.
+        Update status works only if current command status is either one of `pending`, `received`, `processing`.
+        Also the status can move forward only. For example, if current status is `received` it can not be set to `pending`.
+
+        :::note
+        Once the command status is updated to be either `success` or `failure`, the command status can no longer be updated and command is considered to be concluded!
+        :::
+
+        Marking command to be concluded also removes that command from command list.
+        If command status is not updated to the conclusion, the status will be considered as `expired` after expiry interval
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/commands/updateStatus/json
+        ```
+
+      operationId: commands-updateStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                commandId:
+                  type: string
+                status:
+                  type: string
+                ackdata:
+                  type: string
+                ackdatatype:
+                  type: string
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/commands/getDetails:
+    post:
+      tags:
+        - Commands
+      summary: Get command details
+      description: |-
+        Get a command details.
+
+        ## MQTT Topic
+
+        ```
+        $anedya/device/{deviceid}/commands/getDetails/json
+        ```
+
+      operationId: commands-getDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                commandId:
+                  type: string
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  commandId:
+                    type: string
+                  command:
+                    type: string
+                  data:
+                    type: string
+                  datatype:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                      - pending
+                      - received
+                      - processing
+                      - success
+                      - failure
+                  updated:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/ota/next:
+    post:
+      tags:
+        - Over The Air Updates
+      summary: Get next applicable OTA Deployments
+      description: |-
+        Fetches list of next applicable OTA releases. Anedya will return most recent update deployed, after last deployment node has atempted.
+        Anedya will return multiple entries for multiple assets.
+
+        Please note that if multiple deployments are found with same assetidentifier but different version, system will return deployment created most recently.
+
+        Device can choose whether to proceed with the update or skip the update.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/ota/next/json
+        ```
+
+      operationId: v1-ota-next
+      responses:
+        "200":
+          description: Returns an array of applicable deployments.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  data:
+                    $ref: "#/components/schemas/DeviceDeploymentData"
+                  count:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/ota/current:
+    post:
+      tags:
+        - Over The Air Updates
+      summary: Get Ongoing OTA Deployments
+      description: |-
+        Lists ongoing OTA Deployments, for which device has specified status atleast once.
+        This does not list deployments with status: `skipped`, `aborted`, `success` and `failure`.
+        Apart from that any status is considered as "in Progress"
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/ota/current/json
+        ```
+      operationId: v1-ota-current
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CurrentDeploymentData"
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+  /v1/ota/statusUpdate:
+    post:
+      tags:
+        - Over The Air Updates
+      summary: Update Status of an ongoing or new deployment
+      description: |
+        Updates the status of an ongoing or new deployment. Please note that you can directly specify concluding status
+        `success`, `failure` or `skipped` which will put that deployment in concluded state
+        for that node.
+
+        You can specify any arbitary status in between. The status should not 50 characters.
+        Along with each status update device can also submit log string upto 1k characters, which can be
+        used to submit error message in case of failure. Note that this log will not appear in device logs.
+
+        Anedya maintains a log of status changes for each node which can be examined through Anedya dashboard or API.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/ota/updateStatus/json
+        ```
+      operationId: v1-ota-statusUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                deploymentId:
+                  type: string
+                  description: DeploymentID for which status needs to be changed
+                status:
+                  type: string
+                  description: Updated deployment status
+                log:
+                  type: string
+                  maxLength: 1000
+              required:
+                - deploymentId
+                - status
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+      servers:
+        - url: device.<region>.anedya.io
+          description: Anedya Device Endpoint
+components:
+  schemas:
+    DeviceDeploymentData:
+      type: object
+      title: DeviceDeploymentData
+      properties:
+        deploymentId:
+          type: string
+        assetId:
+          type: string
+        assetIdentifier:
+          type: string
+        assetVersion:
+          type: string
+        assetSigned:
+          type: boolean
+        assetSignature:
+          type: string
+        assetMeta:
+          type: object
+          additionalProperties:
+            type: string
+          maxProperties: 50
+        assetChecksum:
+          type: string
+        assetSize:
+          type: string
+        asseturl:
+          type: string
+    CurrentDeploymentData:
+      type: object
+      properties:
+        deploymentId:
+          type: string
+        assetId:
+          type: string
+        assetIdentifier:
+          type: string
+        assetVersion:
+          type: string
+        assetSigned:
+          type: boolean
+        assetSignature:
+          type: string
+        assetMeta:
+          type: object
+          additionalProperties:
+            type: string
+        assetChecksum:
+          type: string
+        assetSize:
+          type: string
+        asseturl:
+          type: string
+        status:
+          type: string
+
+  securitySchemes:
+    Auth-mode:
+      name: Auth-mode
+      type: apiKey
+      in: header
+      description: The value can be either `key` or `tls` depending on the requirement. If the value is `tls` the Authorization header is not mandatory. In case of TLS based authentication priority is given to client certificate and request fails if same can not be verified.
+    Authorization:
+      name: Authorization
+      type: apiKey
+      in: header
+      description: This header is mandatory only if `Auth-mode` is set to `key` and should contain the node connection key. For TLS authentication this header is ignored

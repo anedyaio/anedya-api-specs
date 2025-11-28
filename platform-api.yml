@@ -1,0 +1,2521 @@
+openapi: 3.0.0
+info:
+  version: "1.0"
+  title: Anedya Platform APIs
+  description: |-
+    Anedya APIs provide a standardized way to interact and manage your IoT devices. You can also access the data and perform aggregations on the
+    data submitted by the devices.
+
+    ## Authentication
+    The APIs use API Keys to authenticate the access. You can create an API Key easily through Anedya Dashboard. Please note that the API Keys are
+    project specific and can be used to access data from a single project.
+
+    The API key needs to be passed in the Authorization header as follows:
+    ```
+    Authorization: Bearer <API_KEY>
+    ```
+servers:
+  - url: "https://api.{region}.anedya.io/{API Version}"
+    description: Anedya v1 APIs
+    variables:
+      API Version:
+        description: API Version
+        default: v1
+        enum:
+          - v1
+      region:
+        description: Anedya region
+        default: ap-in-1
+        enum:
+          - ap-in-1
+paths:
+  /node/create:
+    post:
+      tags:
+        - Node management
+      summary: Create new Node
+      description: |-
+        Create a new node. This API allows you to create a new node. In return the API will provide you UUID of the new node created in Anedya platform.
+
+        :::note
+        Creation of new node is limited by the Quota assigned to your account. To maintain quality and to stop abuse, by default Anedya assigns quota of 100 nodes.
+        Please contact support to raise the quota
+        :::
+      operationId: node-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_name:
+                  type: string
+                  description: You can give node a name which will help you identify the node in the Anedya management dashboard
+                node_desc:
+                  type: string
+                  description: Optional description of the node
+                tags:
+                  type: array
+                  description: |-
+                    Tags provide a way to attach properties to nodes. You can specify upto 50 tags on each node.
+                    You can use tags in other APIs to target specific group of nodes.
+                    For example, you can assign tag `model:mk1` to all nodes which has a physical device of model MK1. Once tagged, you can target all MK1 model devices for an OTA Update through filtering by tags.
+                  maxItems: 50
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        description: Key to define a tag. A node can not have two tags with same key
+                        minLength: 1
+                        maxLength: 50
+                      value:
+                        type: string
+                        description: Value for the tag. You can put upto 255 characters in value
+                        minLength: 1
+                        maxLength: 255
+                    required:
+                      - key
+                      - value
+                preauth_id:
+                  type: string
+                  description: Prequthorize a physical device to allow device connection. Please refer to provisioning flow for more details.
+                  format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  nodeId:
+                    type: string
+                    description: 128-bit NodeID of new node created.
+                    format: uuid
+      security:
+        - Authorization: []
+  /node/details:
+    post:
+      tags:
+        - Node management
+      summary: Get node details
+      description: Get details of one or more nodes
+      operationId: node-details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodes:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  Errorcode:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      node1:
+                        type: object
+                        properties:
+                          nodeid:
+                            type: string
+                          node_name:
+                            type: string
+                          node_desc:
+                            type: string
+                          userid:
+                            type: string
+                          deviceId:
+                            type: string
+                          nodeprojectid:
+                            type: string
+                          nodeIdentifier:
+                            type: string
+                          bindingstatus:
+                            type: boolean
+                          nodebindingkey:
+                            type: string
+                          connectionKey:
+                            type: string
+                          created:
+                            type: string
+                          modified:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+      #security:
+      #  - Authorization: []
+      # servers:
+      #  - url: 'https://api.anedya.io/v1'
+      #    description: Anedya v1 APIs
+  /node/list:
+    post:
+      tags:
+        - Node management
+      summary: Get Node List
+      description: |-
+        Get a list of the nodes. Nodes are ordered based on date of creation. You can change order by specifying `order` parameter.
+        Maximum 1000 nodes can be fecthed in one request
+      operationId: node-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                  type: integer
+                  description: Specify how many nodes can be listed. Defaults to 1000 Nodes
+                  default: 1000
+                offset:
+                  type: integer
+                  description: Offset to the next subset of node list
+                order:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  currentCount:
+                    type: integer
+                  totalCount:
+                    type: integer
+                  nodes:
+                    type: array
+                    items:
+                      type: string
+                  offset:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /node/child/add:
+    post:
+      tags:
+        - Node management
+      summary: Add Child Node
+      description: |-
+        Add a child node. Parent node can act as a gateway for the child nodes.
+      operationId: node-child-add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentId:
+                  type: string
+                childNodes:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    properties:
+                      nodeId:
+                        type: string
+                      alias:
+                        type: string
+                    required:
+                      - nodeId
+                      - alias
+              required:
+                - parentId
+                - childNodes
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /node/child/remove:
+    post:
+      tags:
+        - Node management
+      summary: Remove Child Node
+      description: |-
+        Remove a child node.
+      operationId: node-child-remove
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentId:
+                  type: string
+                childNode:
+                  type: string
+              required:
+                - parentId
+                - childNode
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /node/child/clear:
+    post:
+      tags:
+        - Node management
+      summary: Clear all child nodes
+      description: |-
+        Remove all child nodes.
+      operationId: node-child-clear
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentId:
+                  type: string
+              required:
+                - parentId
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /node/child/list:
+    post:
+      tags:
+        - Node management
+      summary: List all child nodes
+      description: |-
+        List all child nodes.
+      operationId: node-child-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentId:
+                  type: string
+                limit:
+                  type: integer
+                  default: 100
+                offset:
+                  type: integer
+                  default: 0
+              required:
+                - parentId
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  totalCount:
+                    type: integer
+                  count:
+                    type: integer
+                  next:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        childId:
+                          type: string
+                        alias:
+                          type: string
+                        createdAt:
+                          type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /node/getConnectionKey:
+    post:
+      tags:
+        - Node management
+      summary: Get Connection Key for Node
+      description: Get connection key for a node
+      operationId: node-getConnectionKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+              required:
+                - nodeid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  connectionKey:
+                    type: string
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /node/update:
+    post:
+      tags:
+        - Node management
+      summary: Update node details
+      description: Update a node details
+      operationId: node-update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+                updates:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - node_name
+                          - node_desc
+                          - key
+                          - deletetag
+                      value:
+                        type: string
+                      tag:
+                        type: object
+                        properties:
+                          key:
+                            type: string
+                          value:
+                            type: string
+            examples:
+              Update multiple fields at once:
+                value:
+                  nodeid: a7d195e2-860b-11ee-8869-d3d6817f6be1
+                  updates:
+                    - type: node_name
+                      value: New Node name
+                    - type: node_desc
+                      value: Updated Multiple Details
+                    - type: key
+                      tag:
+                        key: key
+                        value: New Value
+                    - type: deletetag
+                      tag:
+                        key: keytodelete
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /variables/create:
+    post:
+      tags:
+        - Variable management
+      summary: Create a new variable
+      description: Create a new variable
+      operationId: variable-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - float
+                    - geo
+                name:
+                  type: string
+                desc:
+                  type: string
+                variable:
+                  type: string
+                ttl:
+                  type: integer
+                  description: Time-To-Live(TTL) in months for the data submitted for this variable. By default it is set to 1200 months(100 Years!)
+              required:
+                - type
+                - name
+                - variable
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  variableId:
+                    type: string
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /variables/delete:
+    post:
+      tags:
+        - Variable management
+      summary: Delete a variable
+      description: Delete a variable. All the data submitted for that variable will also be deleted and devices deployed will no longer be able to submit data for that variable.
+      operationId: variables-delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variable:
+                  type: string
+              required:
+                - variable
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /variables/list:
+    post:
+      tags:
+        - Variable management
+      summary: List all Variables
+      description: List all variables.
+      operationId: variables-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  nodeparams:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        variableId:
+                          type: string
+                        name:
+                          type: string
+                        variable:
+                          type: string
+                        ttldays:
+                          type: integer
+                        type:
+                          type: string
+                          enum:
+                            - float
+                            - geo
+                        desc:
+                          type: string
+                  currentCount:
+                    type: integer
+                  offset:
+                    type: integer
+                  totalCount:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+      #  - url: "https://api.anedya.io/v1"
+      #    description: Anedya v1 APIs
+  /data/getData:
+    post:
+      tags:
+        - Data access
+      summary: Get Data for a Variable
+      description: |-
+        :::note
+        This API supports Access Tokens
+        :::
+        Get historical data for a variable
+      operationId: data-getData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variable:
+                  type: string
+                nodes:
+                  type: array
+                  items:
+                    type: string
+                from:
+                  type: integer
+                to:
+                  type: integer
+                limit:
+                  type: integer
+                order:
+                  type: string
+              required:
+                - variable
+                - nodes
+                - from
+                - to
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  variable:
+                    type: string
+                  count:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      nodeid:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            timestamp:
+                              type: integer
+                            value:
+                              description: "Value is a `float` number when datatype is float, `geocoordinate` object when datatype of the variable is `geo`"
+                              oneOf:
+                                - type: object
+                                  properties:
+                                    lat:
+                                      type: number
+                                    long:
+                                      type: number
+                                - type: number
+                          required:
+                            - value
+      #security:
+      #  - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /data/latest:
+    post:
+      tags:
+        - Data access
+      summary: Get latest data for a variable
+      description: Get last submitted data of specified variable for a set of nodes
+      operationId: variables-latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodes:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                variable:
+                  type: string
+              required:
+                - nodes
+                - variable
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        node:
+                          type: string
+                        value:
+                          type: integer
+                        timestamp:
+                          type: integer
+                  count:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /data/snapshot:
+    post:
+      tags:
+        - Data access
+      summary: Get snapshot of variable value at particular time
+      description: Returns value of a variable at a particular time for given set of nodes. Retunrs nearest datapoint submitted before specified time incase no datapoints found at the exact timestamp.
+      operationId: variables-snapshot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timestamp:
+                  type: integer
+                variable:
+                  type: string
+                nodes:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        node:
+                          type: string
+                        value:
+                          type: integer
+                        timestamp:
+                          type: integer
+                  count:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /node/authorize:
+    post:
+      tags:
+        - Node management
+      summary: Authorize a device
+      description: Authorizes a physical device binding it with particular node. It allows to skip binding operation from device side
+      operationId: node-authorize
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+                deviceid:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /node/delete:
+    post:
+      tags:
+        - Node management
+      summary: Delete a node
+      description: Deletes a node. It also deletes all the data submitted by that node and any other related resources on the platform.
+      operationId: node-delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+              required:
+                - nodeid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      #security:
+      #  - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /aggregates/variable/byTime:
+    post:
+      tags:
+        - Aggregations
+      summary: Get Aggregation by Time
+      operationId: post-aggregates-variable-byTime
+      description: |-
+        Time aggregates allows you to question answers like:
+          - What is the average value of a variable over a time period?
+          - What is maximum value of a variable over blocks of 15 minute?
+          - What is the difference between initial and last value of a variable over a week?
+
+        Time aggregation APIs are very powerful APIs which allows you to summarize millions of datapoins into aggregated form on demand.
+        :::note
+        Aggregation APIs incur charge based on how much data scanned to compute the output. Measured in GB-Scanned
+        :::
+        :::note
+        Maximum processing time for each request is 10s
+        :::
+
+        Fields `from` and `to` defines a global range from which data is read. This data is then processed as per provided `config` object.
+        First option defines the type of aggregation you want to perform.
+
+        | Aggregation | Description |
+        |-|-|
+        | `sum` | Sums all values over given interval |
+        | `avg` | Computes average value over given interval |
+        | `median` | Computes median value over given interval |
+        | `min` | Computes minimum value over given interval |
+        | `max` | Computes maximum value over given interval |
+        | `diff` | Computes difference between first and last value over given interval. For example: If values are (1,2,3,1,2) the result will be 1|
+        | `deltasum` | Computes difference between first and last value over given interval, but accounts for reset in counter between time ranges. For example: If values are (1,2,3,1,2) the result will be 5. i.e the decrease in value is neglected. Useful when your values are ever increasing, like energy or water meters|
+
+        Along with aggregation one more field `forEachNode` is specified which controls whether the aggregation should be performed for each individual node
+        specified or values from all nodes should be combined in single output. **Note: This feature works only when valid `filter` object is specified and type is `include`.**
+
+        `interval` object defines the time intervals for aggregation. For example: Specifying aggregation as `max`, interval `type` to be `minute` and `interval`
+        to be `5` will give maximum value of variable in intervals of 5 minutes for the time range specified in `to` and `from`.
+
+        `filter` object allows you to perform aggregation only for a particular set of nodes or excluding particular set of nodes.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variable:
+                  type: string
+                from:
+                  type: integer
+                to:
+                  type: integer
+                config:
+                  type: object
+                  properties:
+                    aggregation:
+                      type: object
+                      properties:
+                        compute:
+                          type: string
+                          enum:
+                            - sum
+                            - avg
+                            - median
+                            - min
+                            - max
+                            - diff
+                            - deltasum
+                            - stddev
+                        forEachNode:
+                          type: boolean
+                      required:
+                        - compute
+                    interval:
+                      type: object
+                      properties:
+                        measure:
+                          type: string
+                          enum:
+                            - year
+                            - month
+                            - week
+                            - day
+                            - hour
+                            - minute
+                        interval:
+                          type: integer
+                    responseOptions:
+                      type: object
+                      properties:
+                        timezone:
+                          type: string
+                          enum:
+                            - UTC
+                    filter:
+                      type: object
+                      properties:
+                        nodes:
+                          type: array
+                          items:
+                            type: string
+                        type:
+                          type: string
+                          enum:
+                            - include
+                            - exclude
+                  required:
+                    - interval
+              required:
+                - variable
+                - from
+                - to
+                - config
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  variable:
+                    type: string
+                  config:
+                    type: object
+                    properties:
+                      aggregation:
+                        type: object
+                        properties:
+                          compute:
+                            type: string
+                          forEachNode:
+                            type: boolean
+                      interval:
+                        type: object
+                        properties:
+                          measure:
+                            type: string
+                          interval:
+                            type: integer
+                      filter:
+                        type: object
+                        properties:
+                          nodes:
+                            type: array
+                            items:
+                              type: string
+                          type:
+                            type: string
+                      responseOptions:
+                        type: object
+                        properties:
+                          timezone:
+                            type: string
+                  data:
+                    type: object
+                    properties:
+                      node1:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            timestamp:
+                              type: integer
+                            aggregate:
+                              type: number
+      #security:
+      #  - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /valuestore/setValue:
+    post:
+      tags:
+        - ValueStore
+      summary: Set a Value
+      description: |-
+        :::note
+        This API supports Access Tokens
+        :::
+        Creates a value in the value store if does not exist, updates if exist.
+        :::note
+        You can store maximum of 512kB of data in a value
+        :::
+      operationId: valuestore-createValue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  type: object
+                  properties:
+                    scope:
+                      type: string
+                      enum:
+                        - global
+                        - node
+                    id:
+                      type: string
+                      description: "Expects a project wide unique string ID for `global` and expects valid nodeID string in case scope is `node`\r\n"
+                  required:
+                    - scope
+                    - id
+                key:
+                  type: string
+                value:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - string
+                    - binary
+                    - float
+                    - boolean
+              required:
+                - namespace
+                - key
+                - value
+                - type
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /valuestore/scan:
+    post:
+      tags:
+        - ValueStore
+      summary: Scan All available items
+      description: |-
+        :::note
+        This API supports Access Tokens
+        :::
+        Scans available items in the valuestore. Can return max 100 items per call.
+      operationId: valuestore-scan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filter:
+                  type: object
+                  properties:
+                    namespace:
+                      type: object
+                      properties:
+                        scope:
+                          type: string
+                          enum:
+                            - global
+                            - node
+                        id:
+                          type: string
+                      required:
+                        - scope
+                  required:
+                    - namespace
+                orderby:
+                  type: string
+                  enum:
+                    - namespace
+                    - key
+                    - created
+                order:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+              required:
+                - filter
+                - orderby
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        namespace:
+                          type: string
+                        key:
+                          type: string
+                        type:
+                          type: string
+                        size:
+                          type: integer
+                  next:
+                    type: integer
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /valuestore/delete:
+    post:
+      tags:
+        - ValueStore
+      summary: Delete a key-value pair
+      description: |-
+        :::note
+        This API supports Access Tokens
+        :::
+        Delete a value stored in the ValueStore
+      operationId: valuestore-delete
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  type: object
+                  properties:
+                    scope:
+                      type: string
+                      enum:
+                        - global
+                        - node
+                    id:
+                      type: string
+                  required:
+                    - scope
+                    - id
+                key:
+                  type: string
+              required:
+                - namespace
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /valuestore/getValue:
+    post:
+      tags:
+        - ValueStore
+      summary: Get a value
+      description: |-
+        :::note
+        This API supports Access Tokens
+        :::
+        Get a value for a key in valuestore.
+      operationId: valuestore-getValue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  type: object
+                  properties:
+                    scope:
+                      type: string
+                    id:
+                      type: string
+                key:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  namespace:
+                    type: object
+                    properties:
+                      scope:
+                        type: string
+                      id:
+                        type: string
+                  key:
+                    type: string
+                  value:
+                    oneOf:
+                      - type: string
+                      - type: number
+                      - type: boolean
+                  type:
+                    type: string
+                  size:
+                    type: integer
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /logs/getLogs:
+    post:
+      tags:
+        - Device Logs
+      summary: Get logs for a node
+      description: Get device logs. Anedya platform will retain the device logs for a period of two months. You can fetch max 1000 lines of logs in a single call
+      operationId: logs-getlogs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+                from:
+                  type: integer
+                to:
+                  type: integer
+                order:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+                limit:
+                  type: integer
+                  minimum: 0
+                  maximum: 1000
+              required:
+                - nodeid
+                - from
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: integer
+                        log:
+                          type: string
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /commands/send:
+    post:
+      tags:
+        - Commands
+      summary: Send a command to Node
+      description: |-
+        Sends a command to a node. If node is online and connected to the platform through MQTT
+        it is sent to the node in realtime. It is also stored and queued if device is not
+        online. Device can execute the commands in order or in parallel depending on application
+        requirement.
+
+        :::note
+        The commands can be queued for maximum of 7 days and is then discarded.
+        :::
+      operationId: commands-send
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                command:
+                  type: string
+                data:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - string
+                    - binary
+                expiry:
+                  type: integer
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+                  commandId:
+                    type: string
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /commands/list:
+    post:
+      tags:
+        - Commands
+      summary: List all issued command
+      description: |-
+        List all issued commands. This API also returns expired commands.
+
+        :::note
+        This API can list maximum of 100 commands in a single API call.
+        :::
+
+        Apply filter to get list of filtered commands. Filter is optional
+      operationId: command-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filter:
+                  type: object
+                  properties:
+                    issuedAfter:
+                      type: string
+                    issuedBefore:
+                      type: string
+                    nodeId:
+                      type: string
+                    status:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                          - pending
+                          - received
+                          - processing
+                          - success
+                          - failure
+                          - invalidated
+                    identifier:
+                      type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                  count:
+                    type: integer
+                  totalCount:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        identifier:
+                          type: string
+                        status:
+                          type: string
+                          enum:
+                            - received
+                            - processing
+                            - success
+                            - failure
+                            - pending
+                            - invalidated
+                        updatedOn:
+                          type: integer
+                        expired:
+                          type: boolean
+                        expiry:
+                          type: integer
+                        issuedAt:
+                          type: integer
+                  next:
+                    type: string
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /commands/status:
+    post:
+      tags:
+        - Commands
+      summary: Get current status of a command
+      operationId: command-status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  id:
+                    type: string
+                  identifier:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                      - pending
+                      - received
+                      - processing
+                      - success
+                      - failure
+                      - invalidated
+                  updatedOn:
+                    type: integer
+                  ackdata:
+                    type: string
+                  ackDataType:
+                    type: string
+                    enum:
+                      - string
+                      - binary
+                  expired:
+                    type: boolean
+                  expiry:
+                    type: integer
+                  issuedAt:
+                    type: integer
+                  data:
+                    type: string
+                  dataType:
+                    type: string
+                    enum:
+                      - string
+                      - binary
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /commands/invalidate:
+    post:
+      tags:
+        - Commands
+      summary: Invalidate issued command
+      description: Invalidate a command. Command can be invalidated only if status is `pending`
+      operationId: command-invalidate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+      security:
+        - Authorization: []
+      #servers:
+  #        - url: "https://api.anedya.io/v1"
+  #          description: Anedya v1 APIs
+  /assets/create:
+    post:
+      tags:
+        - Asset Management
+      summary: Create a new deployable Asset
+      description: |
+        Creates an asset in the system. Returns ID of the asset and a URL which can be used to upload the asset.
+        The asset upload URLs are s3 compaitible and you can upload the assset in single request or through multipart upload over
+        multiple parallel connections. The multipart upload will be valid for 24Hrs only. And if the upload is not completed within 24 Hrs, the partial uploaded parts
+        will be deleted.
+        :::note
+        You need to call completeUpload API afte uploading the asset.
+        :::
+
+        :::note
+        You can upload only one file in asset. If you want to bundle multiple files in single asset, you need to combine them in an archive like zip or tar.
+        :::
+
+        In response you will receive a URL on which `PUT` request needs to be made. A `curl` example is given below
+
+        ```shell
+        curl -X PUT {Upload URL} \\
+          --header 'Content-Disposition: attachment;filename={filename}' \\
+          --header 'Content-Type: application/octet-stream'  -d @path/to/file
+        ```
+      operationId: assets-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assetIdentifier:
+                  type: string
+                  description: "A unique identifier through which your device can identify the deployed file. You can define different assets depending on configuration in your hardware. For example, in a advanced edge computing gateway, there can be multiple services. You can create an asset for each updatedable servce."
+                assetSignature:
+                  type: string
+                  description: |-
+                    You can implement a Signing algorithm without actually creating a signed binary asset.
+                    This option allows you to specify signature outside binary for convenience. You device will recieve this signature along with other information and can use to verify authenticity of the harwdare.
+                assetVersion:
+                  type: string
+                  description: |
+                    Asset version defines a version string. It is upto users to decide which versioning scheme is suitable for their application.
+                assetDesc:
+                  type: string
+                  description: Optional description of asset
+                assetSigned:
+                  type: boolean
+                  description: Set to true if you are specifying the uploaded asset to be either a signed binary or specified by `assetSignature` field.
+                assetMeta:
+                  type: object
+                  description: |-
+                    You can specify upto 50 key value pairs in each asset. This data is also provided to the devices as a part of deployment.
+                    You can implement additional logic in devices to take actions according to data found in asset metadata
+                  additionalProperties:
+                    type: string
+                  maxProperties: 50
+                uploadConfig:
+                  type: object
+                  description: |-
+                    It is adivisable to upload assets larger than 100MB through multipart upload, to get benefit of multiple parallel connections and reduced chance of failure.
+                    You need to divide your whole binary into predefined number of chunks. We recommend maximum chunk size of 100MB. Anedya support maximum 10000 chunks.
+
+                    Please note that each asset part should be minimum 5MB in size or else merge operation will fail
+                  properties:
+                    multipart:
+                      type: boolean
+                      description: Set to true if you want to upload asset in multiple parts
+                      default: false
+                    numberOfParts:
+                      type: integer
+                      description: Number of parts in which you want to upload asset
+                      maximum: 100
+                      default: 1
+                  required:
+                    - multipart
+                checksum:
+                  type: string
+                  description: Specify checksum of the asset. Anedya does not compute checksum. This information is simply passed on to the device. You can implement integrity checks in your device with algorithm of your choice
+                assetFileName:
+                  type: string
+                  description: |-
+                    You can specify the filename which will be provided to downloaded file.
+                    It'll be set as `Content-disposition` header filename parameter when downloaded in browser or in device side
+                    You need to specify same file name in the header as well while uploading the asset in whole or part
+              required:
+                - assetIdentifier
+                - assetVersion
+                - assetSigned
+                - uploadConfig
+                - assetFileName
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assetId:
+                    type: string
+                    description: Unique ID of the created asset
+                  uploadInfo:
+                    type: object
+                    properties:
+                      uploadURL:
+                        type: array
+                        description: "Cotains a presigned S3 URL which can be utilized to upload the asset file\r\nIn case of multipart upload, the platform initates a s3 multipart upload,\r\nretunrs set of multipart upload URLs which can be used to upload multiple parts.\r\n"
+                        items:
+                          type: object
+                          properties:
+                            part:
+                              type: integer
+                              description: Part number
+                            url:
+                              type: string
+                              description: URL to which you can make a `PUT` request to upload the asset
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /assets/list:
+    post:
+      tags:
+        - Asset Management
+      summary: List all Assets
+      description: |
+        Lists all uploaded assets with all metadata and information. You can list upto 100 assets.
+        You can fetch upto 100 assets in a single request.
+      operationId: assets-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filter:
+                  type: object
+                  properties:
+                    orderby:
+                      type: string
+                      enum:
+                        - aidentifiersset
+                        - creation
+                        - assetsize
+                        - astatussset
+                    status:
+                      type: string
+                      enum:
+                        - uploadpending
+                        - queued
+                        - merging
+                        - deployable
+                        - mergefailed
+                    order:
+                      type: string
+                      enum:
+                        - asc
+                        - desc
+                limit:
+                  type: integer
+                  default: 100
+                offset:
+                  type: integer
+                  default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+                  count:
+                    type: integer
+                    description: Returns number of entries returned in the current request
+                  totalCount:
+                    type: integer
+                    description: "Returns the total count of the assets. "
+                  totalStorage:
+                    type: integer
+                    description: "Storage occupied by all assets, in bytes"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        assetId:
+                          type: string
+                        assetIdentifier:
+                          type: string
+                        assetDesc:
+                          type: string
+                        assetMeta:
+                          type: object
+                          maxProperties: 50
+                        assetSize:
+                          type: integer
+                          description: Size of the asset in bytes
+                        assetCurrentVersion:
+                          type: string
+                          description: |
+                            List API returns the most recently uploaded version by time.
+                        created:
+                          type: integer
+                        assetStatus:
+                          type: string
+                          enum:
+                            - uploadpending
+                            - queued
+                            - merging
+                            - deployable
+                            - mergefailed
+                          description: Current status of the asset. Assets with `deployable` status only can be used to deploy an OTA Update
+                  next:
+                    type: integer
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /assets/delete:
+    post:
+      tags:
+        - Asset Management
+      summary: Delete an asset
+      description: |-
+        Deletes an asset or a particular version of asset
+
+        :::note
+        Assets with active deployments can not be deleted
+        :::
+      operationId: assets-delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assetId:
+                  type: string
+                assetVersion:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /assets/get:
+    post:
+      tags:
+        - Asset Management
+      summary: Download an Asset
+      description: "Download an asset from the asset storage. Download supports partial requests and can be downloaded using parallel connections for maximum throughput.\r\nThe provided download URL has an expiry for security reason. The URL can be utilized for maximum of one hour.\r\n\r\n"
+      operationId: assets-get
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assetId:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  assetURL:
+                    type: string
+                  assetIdentifier:
+                    type: string
+                  assetSignature:
+                    type: string
+                  assetVersion:
+                    type: string
+                  assetSigned:
+                    type: string
+                  assetDesc:
+                    type: string
+                  assetMeta:
+                    type: object
+                    maxProperties: 50
+                  checksum:
+                    type: string
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /assets/completeUpload:
+    post:
+      tags:
+        - Asset Management
+      summary: Mark Asset Upload Complete
+      description: "This API must be called after an asset is created, the asset is uploaded to the provided s3 URL. This process marks\r\nthe asset as available for deployments. Without calling this API the asset will not be available for the deployment\r\nand will be deleted after 24Hrs."
+      operationId: post-assets-completeUpload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assetId:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /assets/listVersions:
+    post:
+      tags:
+        - Asset Management
+      summary: List versions of an asset
+      description: List versions of an asset.
+      operationId: assets-listVersions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assetIdentifier:
+                  type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        assetId:
+                          type: string
+                        assetIdentifier:
+                          type: string
+                        assetVersion:
+                          type: string
+                        assetMeta:
+                          type: object
+                        assetSize:
+                          type: integer
+                        created:
+                          type: integer
+                        assetStatus:
+                          type: string
+                  next:
+                    type: string
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /assets/retry:
+    post:
+      tags:
+        - Asset Management
+      summary: Retry asset upload
+      description: |-
+        Provides a mechanism to reupload the asset if upload is failed while creation time.
+        Please note that upload complete marked asset are immutable, this API is available only for assets created but not yet marked uploaded.
+      operationId: assets-retry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assetId:
+                  type: string
+                assetFileName:
+                  type: string
+              required:
+                - assetId
+                - assetFileName
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  url:
+                    type: string
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /deployments/create:
+    post:
+      tags:
+        - OTA Deployments
+      summary: Create a new OTA Deployment
+      description: |
+        Creates a new OTA deployment. Any asset in deployable state can be used for deployment.
+      operationId: deployments-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deploymentName:
+                  type: string
+                deploymentComment:
+                  type: string
+                deploymentStart:
+                  type: integer
+                  description: Specify unix timestamp(UTC) at which deployment will start. You schedule a deployment to become active at any prespecified time.
+                deploymentExpiry:
+                  type: integer
+                  description: |
+                    Specify when deployment should stop.
+                    This paramete stops deployment regardless the active phase.
+                    By default it takes 1 Year from the deployment start date.
+                    You can specify deployments with a maximum period of 5 Years.
+                assetId:
+                  type: string
+                  description: Asset which will be deployed
+                deployementFilter:
+                  type: object
+                  description: |-
+                    Specifies the filter which will be used to target the device tags.
+                    If specified as empty, the deployment will be applicable to all devices in the project
+                  additionalProperties:
+                    type: string
+                  maxProperties: 50
+                deploymentConfig:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    $ref: "#/components/schemas/DeploymentStage"
+              required:
+                - deploymentStart
+                - assetId
+                - deployementFilter
+                - deploymentConfig
+            examples:
+              Example 1:
+                value:
+                  deploymentName: string
+                  deploymentComment: string
+                  deploymentStart: 0
+                  deploymentExpiry: 0
+                  assetId: string
+                  deployementFilter:
+                    property1: string
+                    property2: string
+                  deploymentConfig:
+                    - stageNumber: 1
+                      stageName: string
+                      stageTarget: 0
+                      autoAbort: true
+                      abortCriteria: 0
+                      delay: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  deploymentId:
+                    type: string
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /deployments/analyze:
+    post:
+      tags:
+        - OTA Deployments
+      summary: Get estimate for the deployment plan
+      description: "This API provides an overall estimate on how the deployment plan will be executed and how manyy devices will be targetted\r\non each stage. Please note that, the number of devices given in estimate and actual deployment may change especially if \r\nany device is added or removed."
+      operationId: deployments-analyze
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deployementFilter:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  maxProperties: 50
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+                  errorcode:
+                    type: string
+                  estimation:
+                    type: integer
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /deployments/list:
+    post:
+      tags:
+        - OTA Deployments
+      summary: Get deployment list
+      description: "Get list of all deployments. The API returns preliminary data for each deployment, like status, current stage\r\ntotal number of successes and failures."
+      operationId: deployments-list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filter:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Deployment"
+                  next:
+                    type: integer
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /deployments/abort:
+    post:
+      tags:
+        - OTA Deployments
+      summary: Abort a deployment
+      description: "Aborts a deployment. If device has yet to download the asset, or is downloaded but proceeding with installation will abort the update.\r\nDevices already downloaded and applied successfully will not be affected."
+      operationId: deployment-abort
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deploymentId:
+                  type: string
+              required:
+                - deploymentId
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+      servers:
+        - url: "http://api.anedya.io"
+          description: Anedya Platform APIs
+  /access/tokens/create:
+    post:
+      tags:
+        - Access Tokens
+      summary: Create a new access Token
+      description: |-
+        Create a new access token by providing access policy.
+      operationId: access-token-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiry:
+                  type: integer
+                  description: Expiry time in seconds. After this duration, token will be expired and can not be used to authenticate. Maximum validity can be 3 months.
+                  minimum: 1
+                  maximum: 7776000
+                policy:
+                  type: object
+                  description: Access policy for the token
+                  properties:
+                    resources:
+                      type: object
+                      description: Resources which can be accessed using this token. Please refer to Anedya Access Polivy v1 Documentation for more details.
+                      additionalProperties:
+                        type: string
+                    allow:
+                      type: array
+                      items:
+                        type: string
+                      minItems: 1
+              required:
+                - expiry
+                - policy
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                  tokenId:
+                    type: string
+                  token:
+                    type: string
+      #servers:
+      #  - url: "http://api.anedya.io"
+      #    description: Anedya Platform APIs
+  /access/tokens/revoke:
+    post:
+      tags:
+        - Access Tokens
+      summary: Revoke an Access Token
+      description: |-
+        Revoke any issued token by providing tokenID
+      operationId: access-token-revoke
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tokenId:
+                  type: string
+              required:
+                - tokenId
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+components:
+  schemas:
+    DeploymentStage:
+      type: object
+      title: DeploymentStage
+      properties:
+        stageNumber:
+          type: integer
+          description: Number of the stage when multiple stage are secified. You can specify maximum 10 stages.
+          minimum: 1
+          maximum: 10
+        stageName:
+          type: string
+        stageTarget:
+          type: integer
+          description: "Number of device to target in this phase. If total devices are less than this number, the deployment will remain in this phase, and will not move to next phase."
+        autoAbort:
+          type: boolean
+          description: Whether deployment should be aborted automatically at this stage based on number of failures specified in `abortCriteria`
+        abortCriteria:
+          type: integer
+        delay:
+          type: integer
+          description: Delay before starting next phase
+          minimum: 0
+      required:
+        - stageNumber
+        - stageTarget
+        - autoAbort
+        - abortCriteria
+        - delay
+    Deployment:
+      type: object
+      title: Deployment
+      properties:
+        deploymentId:
+          type: string
+        deploymentName:
+          type: string
+        status:
+          type: string
+        stage:
+          type: integer
+          description: Current deployment or stage count
+        progress:
+          type: integer
+        success:
+          type: integer
+          description: Number of devices reported success so far
+        failure:
+          type: integer
+          description: Number of devices reported failure so far
+        skipped:
+          type: integer
+          description: Number of devices which has skipped this deplyment
+        startTime:
+          type: integer
+          description: When deployment phase was started or will start
+        expiryTime:
+          type: integer
+          description: Time at which deployment will expire
+#components:
+#securitySchemes:
+#  Authorization:
+#    type: apiKey
+#    name: Authorization
+#    in: header
+#security:
+#  - Authorization: []
