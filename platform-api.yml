@@ -15,7 +15,7 @@ info:
     Authorization: Bearer <API_KEY>
     ```
 servers:
-  - url: "https://api.{region}.anedya.io/{API Version}"
+  - url: "https://api.{Region}.anedya.io/{API Version}"
     description: Anedya v1 APIs
     variables:
       API Version:
@@ -23,11 +23,22 @@ servers:
         default: v1
         enum:
           - v1
-      region:
+      Region:
         description: Anedya region
         default: ap-in-1
         enum:
           - ap-in-1
+  - url: "https://{Custom Domain}/{API Version}"
+    description: Custom domain configured in your Anedya Project
+    variables:
+      Custom Domain:
+        description: Your custom domain (e.g., api.yourcompany.com)
+        default: api.example.com
+      API Version:
+        description: API Version
+        default: v1
+        enum:
+          - v1
 paths:
   /node/create:
     post:
