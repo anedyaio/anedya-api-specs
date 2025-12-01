@@ -95,10 +95,73 @@ paths:
                     type: string
                   errorcode:
                     type: integer
-                  nodeId:
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::ok
+                  nodeIds:
                     type: string
                     description: 128-bit NodeID of new node created.
                     format: uuid
+                required:
+                  - success
+                  - error
+                  - nodeId
+                  - reasonCode
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - account::quotaexceeded
+                      - account::suspended
+                      - node::invalidpreauthid
+                      - node::tagcountexceeded
+                      - node::emptytagkey
+                      - node::devidexists
+                      - node::duplicatetagkeys
+                      - node::tagvaluetoobig
+                      - node::emptytagvalue
+                      - node::tagkeytoobig
+                      - node::desctoobig
+                      - node::nametoobig
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       security:
         - Authorization: []
   /node/details:
@@ -137,6 +200,20 @@ paths:
                     properties:
                       node1:
                         type: object
+                        required:
+                          - nodeid
+                          - node_name
+                          - node_desc
+                          - userid
+                          - deviceId
+                          - nodeprojectid
+                          - nodeIdentifier
+                          - bindingstatus
+                          - nodebindingkey
+                          - connectionKey
+                          - created
+                          - modified
+                          - tags
                         properties:
                           nodeid:
                             type: string
@@ -171,6 +248,50 @@ paths:
                                   type: string
                                 value:
                                   type: string
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::limitexceeded
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+
       #security:
       #  - Authorization: []
       # servers:
@@ -227,6 +348,50 @@ paths:
                       type: string
                   offset:
                     type: integer
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidlimit
+                      - node::invalidorder
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       #security:
       #  - Authorization: []
       #servers:
@@ -278,6 +443,58 @@ paths:
                     type: string
                   errorcode:
                     type: integer
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidparentid
+                      - node::invalidchildnodecount
+                      - node::invalidchildnodeid
+                      - node::invalidchild
+                      - node::aliaslengthexceeded
+                      - node::invalidchildalias
+                      - node::childnodenotfound
+                      - node::nodeidnotfound
+                      - node::uniquealiasviolation
+                      - node::uniquechildviolation
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       #security:
       #  - Authorization: []
       #servers:
@@ -311,6 +528,10 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - success
+                  - error
+                  - reasonCode
                 properties:
                   success:
                     type: boolean
@@ -318,6 +539,76 @@ paths:
                     type: string
                   errorcode:
                     type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::ok
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidparentid
+                      - node::invalidchildid
+                      - node::childnotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "404":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - node::childnotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       #security:
       #  - Authorization: []
       #servers:
@@ -348,6 +639,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - success
+                  - error
+                  - errorcode
+                  - reasonCode
                 properties:
                   success:
                     type: boolean
@@ -355,6 +651,74 @@ paths:
                     type: string
                   errorcode:
                     type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::ok
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidparentid
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "404":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - node::childnotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       #security:
       #  - Authorization: []
       #servers:
@@ -415,6 +779,49 @@ paths:
                           type: string
                         createdAt:
                           type: integer
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidparentid
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode    
       #security:
       #  - Authorization: []
       #servers:
@@ -444,6 +851,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - success
+                  - error
+                  - reasonCode
+                  - connectionKey
                 properties:
                   success:
                     type: boolean
@@ -453,6 +865,54 @@ paths:
                     type: integer
                   connectionKey:
                     type: string
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::ok
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidnodeid
+                      - node::nodenotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       #security:
       #  - Authorization: []
       #servers:
@@ -524,11 +984,265 @@ paths:
                     type: string
                   errorcode:
                     type: integer
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::noupdatespecified
+                      - node::toomanyupdates
+                      - node::invalidupdatetype
+                      - node::toomanytags
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "404":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - node::nodenotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
       #security:
       #  - Authorization: []
       #servers:
       #  - url: "https://api.anedya.io/v1"
       #    description: Anedya v1 APIs
+  /node/authorize:
+    post:
+      tags:
+        - Node management
+      summary: Authorize a device
+      description: Authorizes a physical device binding it with particular node. It allows to skip binding operation from device side
+      operationId: node-authorize
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+                deviceid:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - error
+                  - reasonCode
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::ok
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::invalidnodeid
+                      - node::invaliddeviceid
+                      - node::devicenotfound
+                      - node::devidexists
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+      #security:
+      #  - Authorization: []
+      #servers:
+  /node/delete:
+    post:
+      tags:
+        - Node management
+      summary: Delete a node
+      description: Deletes a node. It also deletes all the data submitted by that node and any other related resources on the platform.
+      operationId: node-delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeid:
+                  type: string
+              required:
+                - nodeid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - generic::malformedrequest
+                      - node::missingnodeid
+                      - node::invaliduuid
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - auth::tokennotfound
+                required:
+                  - success
+                  - error
+                  - reasonCode
+        "404":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+                  reasonCode:
+                    type: string
+                    enum:
+                      - node::notfound
+                required:
+                  - success
+                  - error
+                  - reasonCode  
+      #security:
+      #  - Authorization: []
+      #servers:
   /variables/create:
     post:
       tags:
@@ -758,8 +1472,6 @@ paths:
       #security:
       #  - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /data/latest:
     post:
       tags:
@@ -813,8 +1525,6 @@ paths:
       #security:
       #  - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /data/snapshot:
     post:
       tags:
@@ -866,80 +1576,6 @@ paths:
       #security:
       #  - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
-  /node/authorize:
-    post:
-      tags:
-        - Node management
-      summary: Authorize a device
-      description: Authorizes a physical device binding it with particular node. It allows to skip binding operation from device side
-      operationId: node-authorize
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                nodeid:
-                  type: string
-                deviceid:
-                  type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
-  /node/delete:
-    post:
-      tags:
-        - Node management
-      summary: Delete a node
-      description: Deletes a node. It also deletes all the data submitted by that node and any other related resources on the platform.
-      operationId: node-delete
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                nodeid:
-                  type: string
-              required:
-                - nodeid
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /aggregates/variable/byTime:
     post:
       tags:
@@ -1116,8 +1752,6 @@ paths:
       #security:
       #  - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /valuestore/setValue:
     post:
       tags:
@@ -1185,8 +1819,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /valuestore/scan:
     post:
       tags:
@@ -1273,8 +1905,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /valuestore/delete:
     post:
       tags:
@@ -1327,8 +1957,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /valuestore/getValue:
     post:
       tags:
@@ -1390,8 +2018,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /logs/getLogs:
     post:
       tags:
@@ -1449,8 +2075,6 @@ paths:
                         log:
                           type: string
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/send:
     post:
       tags:
@@ -1504,8 +2128,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/list:
     post:
       tags:
@@ -1603,8 +2225,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/status:
     post:
       tags:
@@ -1671,8 +2291,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/invalidate:
     post:
       tags:
@@ -1705,8 +2323,6 @@ paths:
       security:
         - Authorization: []
       #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /assets/create:
     post:
       tags:
@@ -2511,11 +3127,3 @@ components:
         expiryTime:
           type: integer
           description: Time at which deployment will expire
-#components:
-#securitySchemes:
-#  Authorization:
-#    type: apiKey
-#    name: Authorization
-#    in: header
-#security:
-#  - Authorization: []
