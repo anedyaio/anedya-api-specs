@@ -87,18 +87,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  nodeId:
-                    type: string
-                    description: 128-bit NodeID of new node created.
-                    format: uuid
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      nodeId:
+                        type: string
+                        description: 128-bit NodeID of new node created.
+                        format: uuid
       security:
         - Authorization: []
   /node/details:
@@ -118,59 +114,57 @@ paths:
                   type: array
                   items:
                     type: string
+              required:
+                - nodes
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  Errorcode:
-                    type: integer
-                  data:
-                    type: object
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
                     properties:
-                      node1:
+                      data:
                         type: object
                         properties:
-                          nodeid:
-                            type: string
-                          node_name:
-                            type: string
-                          node_desc:
-                            type: string
-                          userid:
-                            type: string
-                          deviceId:
-                            type: string
-                          nodeprojectid:
-                            type: string
-                          nodeIdentifier:
-                            type: string
-                          bindingstatus:
-                            type: boolean
-                          nodebindingkey:
-                            type: string
-                          connectionKey:
-                            type: string
-                          created:
-                            type: string
-                          modified:
-                            type: string
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
+                          node1:
+                            type: object
+                            properties:
+                              nodeid:
+                                type: string
+                              node_name:
+                                type: string
+                              node_desc:
+                                type: string
+                              userid:
+                                type: string
+                              deviceId:
+                                type: string
+                              nodeprojectid:
+                                type: string
+                              nodeIdentifier:
+                                type: string
+                              bindingstatus:
+                                type: boolean
+                              nodebindingkey:
+                                type: string
+                              connectionKey:
+                                type: string
+                              created:
+                                type: string
+                              modified:
+                                type: string
+                              tags:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    value:
+                                      type: string
       #security:
       #  - Authorization: []
       # servers:
@@ -209,29 +203,22 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  currentCount:
-                    type: integer
-                  totalCount:
-                    type: integer
-                  nodes:
-                    type: array
-                    items:
-                      type: string
-                  offset:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      currentCount:
+                        type: integer
+                      totalCount:
+                        type: integer
+                      nodes:
+                        type: array
+                        items:
+                          type: string
+                      offset:
+                        type: integer
+      security:
+        - Authorization: []
   /node/child/add:
     post:
       tags:
@@ -270,19 +257,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /node/child/remove:
     post:
       tags:
@@ -310,19 +287,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /node/child/clear:
     post:
       tags:
@@ -347,19 +314,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /node/child/list:
     post:
       tags:
@@ -390,36 +347,29 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  totalCount:
-                    type: integer
-                  count:
-                    type: integer
-                  next:
-                    type: integer
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        childId:
-                          type: string
-                        alias:
-                          type: string
-                        createdAt:
-                          type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                      count:
+                        type: integer
+                      next:
+                        type: integer
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            childId:
+                              type: string
+                            alias:
+                              type: string
+                            createdAt:
+                              type: integer
+      security:
+        - Authorization: []
   /node/getConnectionKey:
     post:
       tags:
@@ -443,21 +393,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  connectionKey:
-                    type: string
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      connectionKey:
+                        type: string
+      security:
+        - Authorization: []
   /node/update:
     post:
       tags:
@@ -516,19 +459,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /variables/create:
     post:
       tags:
@@ -566,21 +499,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  variableId:
-                    type: string
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      variableId:
+                        type: string
+      security:
+        - Authorization: []
   /variables/delete:
     post:
       tags:
@@ -604,19 +530,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /variables/list:
     post:
       tags:
@@ -632,53 +548,48 @@ paths:
               properties:
                 limit:
                   type: integer
+                  default: 100
                 offset:
                   type: integer
+                  default: 0
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  nodeparams:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        variableId:
-                          type: string
-                        name:
-                          type: string
-                        variable:
-                          type: string
-                        ttldays:
-                          type: integer
-                        type:
-                          type: string
-                          enum:
-                            - float
-                            - geo
-                        desc:
-                          type: string
-                  currentCount:
-                    type: integer
-                  offset:
-                    type: integer
-                  totalCount:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-      #  - url: "https://api.anedya.io/v1"
-      #    description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      nodeparams:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            variableId:
+                              type: string
+                            name:
+                              type: string
+                            variable:
+                              type: string
+                            ttldays:
+                              type: integer
+                            type:
+                              type: string
+                              enum:
+                                - float
+                                - geo
+                            desc:
+                              type: string
+                      currentCount:
+                        type: integer
+                      offset:
+                        type: integer
+                      totalCount:
+                        type: integer
+      security:
+        - Authorization: []
   /data/getData:
     post:
       tags:
@@ -721,45 +632,38 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  variable:
-                    type: string
-                  count:
-                    type: integer
-                  data:
-                    type: object
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
                     properties:
-                      nodeid:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            timestamp:
-                              type: integer
-                            value:
-                              description: "Value is a `float` number when datatype is float, `geocoordinate` object when datatype of the variable is `geo`"
-                              oneOf:
-                                - type: object
-                                  properties:
-                                    lat:
-                                      type: number
-                                    long:
-                                      type: number
-                                - type: number
-                          required:
-                            - value
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+                      variable:
+                        type: string
+                      count:
+                        type: integer
+                      data:
+                        type: object
+                        properties:
+                          nodeid:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                timestamp:
+                                  type: integer
+                                value:
+                                  description: "Value is a `float` number when datatype is float, `geocoordinate` object when datatype of the variable is `geo`"
+                                  oneOf:
+                                    - type: object
+                                      properties:
+                                        lat:
+                                          type: number
+                                        long:
+                                          type: number
+                                    - type: number
+                              required:
+                                - value
+      security:
+        - Authorization: []
   /data/latest:
     post:
       tags:
@@ -810,11 +714,8 @@ paths:
                           type: integer
                   count:
                     type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+      security:
+        - Authorization: []
   /data/snapshot:
     post:
       tags:
@@ -836,38 +737,35 @@ paths:
                   type: array
                   items:
                     type: string
+              required:
+                - timestamp
+                - variable
+                - nodes
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        node:
-                          type: string
-                        value:
-                          type: integer
-                        timestamp:
-                          type: integer
-                  count:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            node:
+                              type: string
+                            value:
+                              type: integer
+                            timestamp:
+                              type: integer
+                      count:
+                        type: integer
+      security:
+        - Authorization: []
   /node/authorize:
     post:
       tags:
@@ -885,25 +783,18 @@ paths:
                   type: string
                 deviceid:
                   type: string
+              required:
+                - nodeid
+                - deviceid
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /node/delete:
     post:
       tags:
@@ -927,19 +818,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+                $ref: '#/components/schemas/BaseResponse'
+      security:
+        - Authorization: []
   /aggregates/variable/byTime:
     post:
       tags:
@@ -1060,64 +941,57 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  variable:
-                    type: string
-                  config:
-                    type: object
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
                     properties:
-                      aggregation:
+                      variable:
+                        type: string
+                      config:
                         type: object
                         properties:
-                          compute:
-                            type: string
-                          forEachNode:
-                            type: boolean
-                      interval:
-                        type: object
-                        properties:
-                          measure:
-                            type: string
+                          aggregation:
+                            type: object
+                            properties:
+                              compute:
+                                type: string
+                              forEachNode:
+                                type: boolean
                           interval:
-                            type: integer
-                      filter:
+                            type: object
+                            properties:
+                              measure:
+                                type: string
+                              interval:
+                                type: integer
+                          filter:
+                            type: object
+                            properties:
+                              nodes:
+                                type: array
+                                items:
+                                  type: string
+                              type:
+                                type: string
+                          responseOptions:
+                            type: object
+                            properties:
+                              timezone:
+                                type: string
+                      data:
                         type: object
                         properties:
-                          nodes:
+                          node1:
                             type: array
                             items:
-                              type: string
-                          type:
-                            type: string
-                      responseOptions:
-                        type: object
-                        properties:
-                          timezone:
-                            type: string
-                  data:
-                    type: object
-                    properties:
-                      node1:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            timestamp:
-                              type: integer
-                            aggregate:
-                              type: number
-      #security:
-      #  - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+                              type: object
+                              properties:
+                                timestamp:
+                                  type: integer
+                                aggregate:
+                                  type: number
+      security:
+        - Authorization: []
   /valuestore/setValue:
     post:
       tags:
@@ -1174,14 +1048,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
+                $ref: '#/components/schemas/BaseResponse'
       security:
         - Authorization: []
       #servers:
@@ -1361,32 +1228,28 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  namespace:
-                    type: object
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
                     properties:
-                      scope:
+                      namespace:
+                        type: object
+                        properties:
+                          scope:
+                            type: string
+                          id:
+                            type: string
+                      key:
                         type: string
-                      id:
+                      value:
+                        oneOf:
+                          - type: string
+                          - type: number
+                          - type: boolean
+                      type:
                         type: string
-                  key:
-                    type: string
-                  value:
-                    oneOf:
-                      - type: string
-                      - type: number
-                      - type: boolean
-                  type:
-                    type: string
-                  size:
-                    type: integer
+                      size:
+                        type: integer
       security:
         - Authorization: []
       #servers:
@@ -1429,28 +1292,23 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  count:
-                    type: integer
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        timestamp:
-                          type: integer
-                        log:
-                          type: string
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      count:
+                        type: integer
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            timestamp:
+                              type: integer
+                            log:
+                              type: string
+      security:
+        - Authorization: []
   /commands/send:
     post:
       tags:
@@ -1485,27 +1343,26 @@ paths:
                     - binary
                 expiry:
                   type: integer
+                  description: Command expiry time in seconds from issue time. Default is 7 days (604800 seconds)
+              required:
+                - nodeId
+                - command
+                - data
+                - type
       responses:
         2XX:
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: string
-                  commandId:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      commandId:
+                        type: string
       security:
         - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/list:
     post:
       tags:
@@ -1558,53 +1415,46 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  reasonCode:
-                    type: string
-                  count:
-                    type: integer
-                  totalCount:
-                    type: integer
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        identifier:
-                          type: string
-                        status:
-                          type: string
-                          enum:
-                            - received
-                            - processing
-                            - success
-                            - failure
-                            - pending
-                            - invalidated
-                        updatedOn:
-                          type: integer
-                        expired:
-                          type: boolean
-                        expiry:
-                          type: integer
-                        issuedAt:
-                          type: integer
-                  next:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                      count:
+                        type: integer
+                      totalCount:
+                        type: integer
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            identifier:
+                              type: string
+                            status:
+                              type: string
+                              enum:
+                                - received
+                                - processing
+                                - success
+                                - failure
+                                - pending
+                                - invalidated
+                            updatedOn:
+                              type: integer
+                            expired:
+                              type: boolean
+                            expiry:
+                              type: integer
+                            issuedAt:
+                              type: integer
+                      next:
+                        type: string
       security:
         - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/status:
     post:
       tags:
@@ -1625,54 +1475,47 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  id:
-                    type: string
-                  identifier:
-                    type: string
-                  status:
-                    type: string
-                    enum:
-                      - pending
-                      - received
-                      - processing
-                      - success
-                      - failure
-                      - invalidated
-                  updatedOn:
-                    type: integer
-                  ackdata:
-                    type: string
-                  ackDataType:
-                    type: string
-                    enum:
-                      - string
-                      - binary
-                  expired:
-                    type: boolean
-                  expiry:
-                    type: integer
-                  issuedAt:
-                    type: integer
-                  data:
-                    type: string
-                  dataType:
-                    type: string
-                    enum:
-                      - string
-                      - binary
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      identifier:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - pending
+                          - received
+                          - processing
+                          - success
+                          - failure
+                          - invalidated
+                      updatedOn:
+                        type: integer
+                      ackdata:
+                        type: string
+                      ackDataType:
+                        type: string
+                        enum:
+                          - string
+                          - binary
+                      expired:
+                        type: boolean
+                      expiry:
+                        type: integer
+                      issuedAt:
+                        type: integer
+                      data:
+                        type: string
+                      dataType:
+                        type: string
+                        enum:
+                          - string
+                          - binary
       security:
         - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /commands/invalidate:
     post:
       tags:
@@ -1694,19 +1537,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: string
+                $ref: '#/components/schemas/BaseResponse'
       security:
         - Authorization: []
-      #servers:
-  #        - url: "https://api.anedya.io/v1"
-  #          description: Anedya v1 APIs
   /assets/create:
     post:
       tags:
@@ -1805,26 +1638,28 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  assetId:
-                    type: string
-                    description: Unique ID of the created asset
-                  uploadInfo:
-                    type: object
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
                     properties:
-                      uploadURL:
-                        type: array
-                        description: "Cotains a presigned S3 URL which can be utilized to upload the asset file\r\nIn case of multipart upload, the platform initates a s3 multipart upload,\r\nretunrs set of multipart upload URLs which can be used to upload multiple parts.\r\n"
-                        items:
-                          type: object
-                          properties:
-                            part:
-                              type: integer
-                              description: Part number
-                            url:
-                              type: string
-                              description: URL to which you can make a `PUT` request to upload the asset
+                      assetId:
+                        type: string
+                        description: Unique ID of the created asset
+                      uploadInfo:
+                        type: object
+                        properties:
+                          uploadURL:
+                            type: array
+                            description: "Cotains a presigned S3 URL which can be utilized to upload the asset file\r\nIn case of multipart upload, the platform initates a s3 multipart upload,\r\nretunrs set of multipart upload URLs which can be used to upload multiple parts.\r\n"
+                            items:
+                              type: object
+                              properties:
+                                part:
+                                  type: integer
+                                  description: Part number
+                                url:
+                                  type: string
+                                  description: URL to which you can make a `PUT` request to upload the asset
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -1878,57 +1713,53 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: string
-                  count:
-                    type: integer
-                    description: Returns number of entries returned in the current request
-                  totalCount:
-                    type: integer
-                    description: "Returns the total count of the assets. "
-                  totalStorage:
-                    type: integer
-                    description: "Storage occupied by all assets, in bytes"
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        assetId:
-                          type: string
-                        assetIdentifier:
-                          type: string
-                        assetDesc:
-                          type: string
-                        assetMeta:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      count:
+                        type: integer
+                        description: Returns number of entries returned in the current request
+                      totalCount:
+                        type: integer
+                        description: "Returns the total count of the assets. "
+                      totalStorage:
+                        type: integer
+                        description: "Storage occupied by all assets, in bytes"
+                      data:
+                        type: array
+                        items:
                           type: object
-                          maxProperties: 50
-                        assetSize:
-                          type: integer
-                          description: Size of the asset in bytes
-                        assetCurrentVersion:
-                          type: string
-                          description: |
-                            List API returns the most recently uploaded version by time.
-                        created:
-                          type: integer
-                        assetStatus:
-                          type: string
-                          enum:
-                            - uploadpending
-                            - queued
-                            - merging
-                            - deployable
-                            - mergefailed
-                          description: Current status of the asset. Assets with `deployable` status only can be used to deploy an OTA Update
-                  next:
-                    type: integer
+                          properties:
+                            assetId:
+                              type: string
+                            assetIdentifier:
+                              type: string
+                            assetDesc:
+                              type: string
+                            assetMeta:
+                              type: object
+                              maxProperties: 50
+                            assetSize:
+                              type: integer
+                              description: Size of the asset in bytes
+                            assetCurrentVersion:
+                              type: string
+                              description: |
+                                List API returns the most recently uploaded version by time.
+                            created:
+                              type: integer
+                            assetStatus:
+                              type: string
+                              enum:
+                                - uploadpending
+                                - queued
+                                - merging
+                                - deployable
+                                - mergefailed
+                              description: Current status of the asset. Assets with `deployable` status only can be used to deploy an OTA Update
+                      next:
+                        type: integer
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -1954,20 +1785,15 @@ paths:
                   type: string
                 assetVersion:
                   type: string
+              required:
+                - assetId
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
+                $ref: '#/components/schemas/BaseResponse'
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -1986,37 +1812,35 @@ paths:
               properties:
                 assetId:
                   type: string
+              required:
+                - assetId
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  assetURL:
-                    type: string
-                  assetIdentifier:
-                    type: string
-                  assetSignature:
-                    type: string
-                  assetVersion:
-                    type: string
-                  assetSigned:
-                    type: string
-                  assetDesc:
-                    type: string
-                  assetMeta:
-                    type: object
-                    maxProperties: 50
-                  checksum:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      assetURL:
+                        type: string
+                      assetIdentifier:
+                        type: string
+                      assetSignature:
+                        type: string
+                      assetVersion:
+                        type: string
+                      assetSigned:
+                        type: string
+                      assetDesc:
+                        type: string
+                      assetMeta:
+                        type: object
+                        maxProperties: 50
+                      checksum:
+                        type: string
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2035,20 +1859,15 @@ paths:
               properties:
                 assetId:
                   type: string
+              required:
+                - assetId
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: string
+                $ref: '#/components/schemas/BaseResponse'
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2069,45 +1888,45 @@ paths:
                   type: string
                 limit:
                   type: integer
+                  default: 100
                 offset:
                   type: integer
+                  default: 0
+              required:
+                - assetIdentifier
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  count:
-                    type: integer
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        assetId:
-                          type: string
-                        assetIdentifier:
-                          type: string
-                        assetVersion:
-                          type: string
-                        assetMeta:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      count:
+                        type: integer
+                      data:
+                        type: array
+                        items:
                           type: object
-                        assetSize:
-                          type: integer
-                        created:
-                          type: integer
-                        assetStatus:
-                          type: string
-                  next:
-                    type: string
+                          properties:
+                            assetId:
+                              type: string
+                            assetIdentifier:
+                              type: string
+                            assetVersion:
+                              type: string
+                            assetMeta:
+                              type: object
+                            assetSize:
+                              type: integer
+                            created:
+                              type: integer
+                            assetStatus:
+                              type: string
+                      next:
+                        type: string
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2139,16 +1958,12 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  url:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      url:
+                        type: string
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2226,16 +2041,12 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  deploymentId:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      deploymentId:
+                        type: string
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2257,22 +2068,20 @@ paths:
                   additionalProperties:
                     type: string
                   maxProperties: 50
+              required:
+                - deployementFilter
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                  error:
-                    type: string
-                  errorcode:
-                    type: string
-                  estimation:
-                    type: integer
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      estimation:
+                        type: integer
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2304,22 +2113,18 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  count:
-                    type: integer
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Deployment"
-                  next:
-                    type: integer
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      count:
+                        type: integer
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Deployment"
+                      next:
+                        type: integer
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2346,14 +2151,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
+                $ref: '#/components/schemas/BaseResponse'
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2399,20 +2197,16 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  reasonCode:
-                    type: string
-                  tokenId:
-                    type: string
-                  token:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                      tokenId:
+                        type: string
+                      token:
+                        type: string
       #servers:
       #  - url: "http://api.anedya.io"
       #    description: Anedya Platform APIs
@@ -2440,18 +2234,36 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  error:
-                    type: string
-                  errorcode:
-                    type: integer
-                  reasonCode:
-                    type: string
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+      security:
+        - Authorization: []
 components:
   schemas:
+    BaseResponse:
+      type: object
+      title: BaseResponse
+      description: Standard response structure returned by all API endpoints
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the request was successful
+        error:
+          type: string
+          description: Error message if the request failed, empty if successful
+        errorcode:
+          type: integer
+          description: Legacy error code (deprecated, use reasonCode instead)
+          deprecated: true
+        reasonCode:
+          type: string
+          description: Machine-readable error code for programmatic error handling
+      required:
+        - success
     DeploymentStage:
       type: object
       title: DeploymentStage
@@ -2511,11 +2323,11 @@ components:
         expiryTime:
           type: integer
           description: Time at which deployment will expire
-#components:
-#securitySchemes:
-#  Authorization:
-#    type: apiKey
-#    name: Authorization
-#    in: header
-#security:
-#  - Authorization: []
+  securitySchemes:
+    Authorization:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: API Key authentication. Pass your API key as a Bearer token in the Authorization header.
+security:
+  - Authorization: []
