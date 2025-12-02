@@ -219,10 +219,10 @@ paths:
                               type: string
                               description: Connection key that devices use to authenticate and connect to the platform
                             created:
-                              type: integer
+                              type: string
                               description: Unix timestamp when node was created
                             modified:
-                              type: integer
+                              type: string
                               description: Unix timestamp when node was last modified
                             tags:
                               type: array
