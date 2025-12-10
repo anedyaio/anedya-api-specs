@@ -1077,10 +1077,55 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/BaseResponse'
                   - type: object
+                    required:
+                      - variableId
+                      - variable
                     properties:
                       variableId:
                         type: string
                         description: Unique identifier for the created variable
+                      variable:
+                        type: string
+                        description: Variable identifier string
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - generic::malformedrequest
+                          - node::invalidvariableidentifier
+                          - node::invalidname
+                          - node::invaliddesc
+                          - node::invalidttl
+                          - node::duplicateidentifier
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - auth::tokennotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
       security:
         - Authorization: []
   /variables/delete:
@@ -1107,6 +1152,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - generic::malformedrequest
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - auth::tokennotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "404":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - variable::notfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
       security:
         - Authorization: []
   /variables/list:
@@ -1166,6 +1262,42 @@ paths:
                         type: integer
                       totalCount:
                         type: integer
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - generic::malformedrequest
+                          - variable::limitexceeded
+                          - variable::invalidoffset
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - auth::tokennotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
       security:
         - Authorization: []
   /data/getData:
@@ -1214,6 +1346,7 @@ paths:
                 - nodes
                 - from
                 - to
+                - order
       responses:
         "200":
           description: OK
@@ -1253,6 +1386,44 @@ paths:
                                     - type: number
                               required:
                                 - value
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - generic::malformedrequest
+                          - data::variablenotfound
+                          - data::invalidtimerange
+                          - data::invalidlimit
+                          - data::invalidorder
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - auth::tokennotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
       security:
         - Authorization: []
   /data/latest:
@@ -1289,33 +1460,68 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: array
-                        description: Array of latest data points for each node
-                        items:
+                        type: object
+                        description: The main data payload. Keys are dynamic IDs (e.g., GUIDs) and values are data objects.
+                        additionalProperties:
                           type: object
                           properties:
-                            node:
-                              type: string
-                              description: Node ID
-                              format: uuid
-                            value:
-                              oneOf:
-                                - type: number
-                                  description: Value for float type variables
-                                - type: object
-                                  description: Value for geo type variables
-                                  properties:
-                                    lat:
-                                      type: number
-                                    lng:
-                                      type: number
-                              description: Latest value of the variable
                             timestamp:
                               type: integer
-                              description: Unix timestamp when the data was submitted
-                      count:
-                        type: integer
-                        description: Number of data points returned
+                              format: int64
+                              description: Unix timestamp of the data point.
+                              example: 1765353030
+                            value:
+                              type: number
+                              description: The actual value.
+                              example: 10
+                          required:
+                            - timestamp
+                            - value
+                      variable:
+                        type: string
+                        description: Identifier for the variable being queried.
+                        example: "temperature-f033495c"
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+                      - data
+                      - variable
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - generic::malformedrequest
+                          - data::variablenotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - auth::tokennotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
       security:
         - Authorization: []
   /data/snapshot:
@@ -1354,18 +1560,63 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: array
-                        items:
+                        type: object
+                        description: The main data payload. Keys are dynamic IDs (e.g., GUIDs) and values are data objects.
+                        additionalProperties:
                           type: object
                           properties:
-                            node:
-                              type: string
-                            value:
-                              type: integer
                             timestamp:
                               type: integer
-                      count:
-                        type: integer
+                              format: int64
+                              description: Unix timestamp of the data point.
+                              example: 1765353030
+                            value:
+                              type: number
+                              description: The actual value.
+                              example: 10
+                          required:
+                            - timestamp
+                            - value
+                      variable:
+                        type: string
+                        description: Identifier for the variable being queried.
+                        example: "temperature-f033495c"
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - generic::malformedrequest
+                          - data::variablenotfound
+                          - data::invalidtimerange
+                    required:
+                      - success
+                      - error
+                      - reasonCode
+        "401":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      reasonCode:
+                        type: string
+                        enum:
+                          - auth::tokennotfound
+                    required:
+                      - success
+                      - error
+                      - reasonCode
       security:
         - Authorization: []
   /aggregates/variable/byTime:
