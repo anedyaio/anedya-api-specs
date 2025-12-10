@@ -1100,11 +1100,12 @@ paths:
                         type: string
                         enum:
                           - generic::malformedrequest
-                          - node::invalidvariableidentifier
-                          - node::invalidname
-                          - node::invaliddesc
-                          - node::invalidttl
-                          - node::duplicateidentifier
+                          - variable::invalidvariableidentifier
+                          - variable::invalidname
+                          - variable::invaliddesc
+                          - variable::invalidttl
+                          - variable::duplicateidentifier
+                          - variable::invalidtype
                     required:
                       - success
                       - error
