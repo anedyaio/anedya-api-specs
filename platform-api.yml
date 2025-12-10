@@ -99,7 +99,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       nodeId:
@@ -134,7 +134,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       data:
@@ -229,7 +229,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       currentCount:
@@ -287,7 +287,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /node/child/remove:
@@ -317,7 +317,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /node/child/clear:
@@ -344,7 +344,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /node/child/list:
@@ -382,7 +382,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       totalCount:
@@ -432,7 +432,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       connectionKey:
@@ -498,7 +498,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /variables/create:
@@ -539,7 +539,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       variableId:
@@ -570,7 +570,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /variables/list:
@@ -601,7 +601,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       nodeparams:
@@ -685,7 +685,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       variable:
@@ -749,7 +749,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       data:
@@ -814,7 +814,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       data:
@@ -858,7 +858,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /node/delete:
@@ -884,7 +884,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /aggregates/variable/byTime:
@@ -1008,7 +1008,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       variable:
@@ -1114,7 +1114,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
       #servers:
@@ -1179,7 +1179,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       count:
@@ -1266,7 +1266,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
       #servers:
@@ -1305,7 +1305,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       namespace:
@@ -1384,7 +1384,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       count:
@@ -1449,7 +1449,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       commandId:
@@ -1510,7 +1510,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       reasonCode:
@@ -1570,7 +1570,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       id:
@@ -1631,7 +1631,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
   /assets/create:
@@ -1733,7 +1733,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       assetId:
@@ -1808,7 +1808,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       count:
@@ -1892,7 +1892,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -1920,7 +1920,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       assetURL:
@@ -1974,7 +1974,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2008,7 +2008,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       count:
@@ -2076,7 +2076,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       url:
@@ -2160,7 +2160,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       deploymentId:
@@ -2196,7 +2196,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       estimation:
@@ -2234,7 +2234,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       count:
@@ -2274,7 +2274,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: "#/components/schemas/BaseResponse"
       servers:
         - url: "http://api.anedya.io"
           description: Anedya Platform APIs
@@ -2321,7 +2321,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       reasonCode:
@@ -2358,7 +2358,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/BaseResponse'
+                  - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
                       reasonCode:
@@ -2378,7 +2378,7 @@ components:
         error:
           type: string
           description: Error message if the request failed, empty if successful
-        errorcode:
+        errcode:
           type: integer
           description: Legacy error code (deprecated, use reasonCode instead)
           deprecated: true
