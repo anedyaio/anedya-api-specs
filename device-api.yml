@@ -106,6 +106,50 @@ paths:
                     - variable: variable-identifier
                       value: "status-string"
                       timestamp: 1714392140000
+  /v1/heartbeat:
+    post:
+      summary: Send a Heartbeat to Anedya
+      operationId: heartbeat
+      tags:
+        - Operations
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errcode:
+                    type: integer
+      description: |-
+        Devices can send a heartbeat to this endpoint.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/heartbeat/json
+        ```
+
+      security:
+        - Auth-mode: []
+          Authorization: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqID:
+                  type: string
+            examples:
+              Device Heartbeat:
+                value:
+                  reqID: "unique-request-id"
   /v1/gateway/submitData:
     post:
       summary: Submit Data to Anedya through a Gateway
