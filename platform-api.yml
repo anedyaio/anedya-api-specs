@@ -1634,6 +1634,133 @@ paths:
                 $ref: "#/components/schemas/BaseResponse"
       security:
         - Authorization: []
+  /streams/create:
+    post:
+      tags:
+        - Streams(Beta)
+      summary: Create a new stream
+      description: Create a new stream which can be connected by end user client.
+      operationId: streams-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sources:
+                  type: object
+                  properties:
+                    nodes:
+                      type: array
+                      items:
+                        type: string
+                events:
+                  type: array
+                  items:
+                    type: string
+                  description: List of the events which will be delivered in the stream. put `*` to receive all events.
+                variables:
+                  type: array
+                  items:
+                    type: string
+                  description: List of the variables for which submitted data will be delivered in the stream. put `*` to receive all variables.
+                expiry:
+                  type: integer
+                  description: Expiry the stream in seconds from creation time. Default is 7 days. Maximum 1 year is allowed.
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      streamId:
+                        type: string
+                      streamUrl:
+                        type: string
+                        description: URL to which client can connect to receive the stream data. It is a websocket URL and client can connect to it using any websocket client library. It uses ANEDYA Signaure Version 1 Authentication.
+      security:
+        - Authorization: []
+  /streams/delete:
+    post:
+      tags:
+        - Streams(Beta)
+      summary: Delete a stream
+      description: Delete a stream
+      operationId: streams-delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                streamId:
+                  type: string
+              required:
+                - streamId
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+      security:
+        - Authorization: []
+  /relay/create:
+    post:
+      tags:
+        - Relay(Beta)
+      summary: Create a Relay
+      description: Create new relay credentials. Currently only `turn` relay is supported. Please note that these credentials do not affect your current quota. Your current relay count is updated only when a turn allocation is created.
+      operationId: relay-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                relayType:
+                  type: string
+                  enum:
+                    - turn
+              required:
+                - relayType
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      relayType:
+                        type: string
+                        enum:
+                          - turn
+                        description: Type of the relay. Currently only `turn` is supported
+                      relayData:
+                        type: object
+                        properties:
+                          endpoint:
+                            type: string
+                            description: Relay endpoint which can be used in your turn client configuration
+                          username:
+                            type: string
+                            description: Username for the relay authentication
+                          password:
+                            type: string
+                            description: Password for the relay authentication
+                      relayExpiry:
+                        type: integer
+                        description: Expiry time of the relay credentials in UTC.
+      security:
+        - Authorization: []
   /assets/create:
     post:
       tags:
