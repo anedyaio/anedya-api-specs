@@ -1652,8 +1652,10 @@ paths:
                   properties:
                     nodes:
                       type: array
+                      description: List of node IDs to stream data from.
                       items:
                         type: string
+                        format: uuid
                 events:
                   type: array
                   items:
@@ -1667,8 +1669,10 @@ paths:
                 expiry:
                   type: integer
                   description: Expiry the stream in seconds from creation time. Default is 7 days. Maximum 1 year is allowed.
+                  default: 604800
+                  maximum: 31536000
       responses:
-        2XX:
+        200:
           description: Success
           content:
             application/json:
@@ -1679,9 +1683,10 @@ paths:
                     properties:
                       streamId:
                         type: string
+                        format: uuid
                       streamUrl:
                         type: string
-                        description: URL to which client can connect to receive the stream data. It is a websocket URL and client can connect to it using any websocket client library. It uses ANEDYA Signaure Version 1 Authentication.
+                        description: URL to which client can connect to receive the stream data. It is a websocket URL and client can connect to it using any websocket client library. It uses ANEDYA Signature Version 1 Authentication.
       security:
         - Authorization: []
   /streams/delete:
@@ -1699,10 +1704,11 @@ paths:
               properties:
                 streamId:
                   type: string
+                  format: uuid
               required:
                 - streamId
       responses:
-        2XX:
+        200:
           description: Success
           content:
             application/json:
@@ -1730,7 +1736,7 @@ paths:
               required:
                 - relayType
       responses:
-        2XX:
+        200:
           description: Success
           content:
             application/json:
