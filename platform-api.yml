@@ -1671,6 +1671,8 @@ paths:
                   description: Expiry the stream in seconds from creation time. Default is 7 days. Maximum 1 year is allowed.
                   default: 604800
                   maximum: 31536000
+              required:
+                - sources
       responses:
         200:
           description: Success
