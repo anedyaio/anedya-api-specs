@@ -1721,7 +1721,7 @@ paths:
   /relay/create:
     post:
       tags:
-        - Relay(Beta)
+        - WebRTC Streaming(Beta)
       summary: Create a Relay
       description: Create new relay credentials. Currently only `turn` relay is supported. Please note that these credentials do not affect your current quota. Your current relay count is updated only when a turn allocation is created.
       operationId: relay-create
