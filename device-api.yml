@@ -109,9 +109,10 @@ paths:
   /v1/heartbeat:
     post:
       summary: Send a Heartbeat to Anedya
+
       operationId: heartbeat
       tags:
-        - Operations
+        - Device Health
       responses:
         "200":
           description: OK
@@ -120,11 +121,13 @@ paths:
               schema:
                 type: object
                 properties:
+                  reqId:
+                    type: string
                   success:
                     type: boolean
                   error:
                     type: string
-                  errcode:
+                  errorcode:
                     type: integer
       description: |-
         Devices can send a heartbeat to this endpoint.
@@ -144,12 +147,12 @@ paths:
             schema:
               type: object
               properties:
-                reqID:
+                reqId:
                   type: string
             examples:
               Device Heartbeat:
                 value:
-                  reqID: "unique-request-id"
+                  reqId: "unique-request-id"
   /v1/gateway/submitData:
     post:
       summary: Submit Data to Anedya through a Gateway
@@ -1090,6 +1093,65 @@ paths:
       servers:
         - url: device.<region>.anedya.io
           description: Anedya Device Endpoint
+  /v1/events/submit:
+    post:
+      summary: Submit Event
+      operationId: submitEvent
+      tags:
+        - Events
+      description: |-
+        Devices can submit events to this endpoint.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/events/submit/json
+        ```
+      security:
+        - Auth-mode: []
+          Authorization: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                eventType:
+                  type: string
+                  description: Type of the event (e.g., dooropen)
+                timestamp:
+                  type: integer
+                  description: Unix epoch in millisecond format.
+                data:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    severity:
+                      type: string
+              required:
+                - eventType
+                - data
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reqId:
+                    type: string
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorcode:
+                    type: integer
+                  eventId:
+                    type: string
+                    format: uuid
 components:
   schemas:
     DeviceDeploymentData:
