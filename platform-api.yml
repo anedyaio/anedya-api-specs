@@ -632,6 +632,60 @@ paths:
                         type: integer
       security:
         - Authorization: []
+  /health/status:
+    post:
+      tags:
+        - Device Health
+      summary: Get device health
+      description: |-
+        Get health status of one or more devices.
+
+        ## MQTT Topic
+        ```
+        $anedya/device/{deviceid}/heartbeat/json
+        ```
+      operationId: health-status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodes:
+                  type: array
+                  description: Array of node IDs to check health for
+                  items:
+                    type: string
+                    format: uuid
+                lastContactThreshold:
+                  type: integer
+                  description: Threshold in seconds to consider a device offline if no contact is made.
+              required:
+                - nodes
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        description: Object containing health status keyed by node ID
+                        additionalProperties:
+                          type: object
+                          properties:
+                            online:
+                              type: boolean
+                              description: Whether the device is online
+                            lastHeartbeat:
+                              type: integer
+                              description: Unix timestamp of the last heartbeat received
+      security:
+        - Authorization: []
   /data/getData:
     post:
       tags:
