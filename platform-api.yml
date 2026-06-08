@@ -1767,21 +1767,34 @@ paths:
                       items:
                         type: string
                         format: uuid
+                      example:
+                        - "019e8d46-e895-713f-b763-6969b36e37a4"
+                  required:
+                    - nodes
                 events:
                   type: array
-                  items:
-                    type: string
                   description: List of the events which will be delivered in the stream. put `*` to receive all events.
+                  enum:
+                    - "valuestore::updates"
+                    - "valuestore::delete"
+                    - "events::nodeevents"
+                  example:
+                    - "valuestore::updates"
+                    - "valuestore::delete"
+                    - "events::nodeevents"
                 variables:
                   type: array
                   items:
                     type: string
                   description: List of the variables for which submitted data will be delivered in the stream. put `*` to receive all variables.
+                  example:
+                    - "temperature"
                 expiry:
                   type: integer
                   description: Expiry the stream in seconds from creation time. Default is 7 days. Maximum 1 year is allowed.
                   default: 604800
                   maximum: 31536000
+                  example: 86377
               required:
                 - sources
       responses:
