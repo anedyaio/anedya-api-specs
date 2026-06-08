@@ -30,7 +30,7 @@ paths:
                     type: boolean
                   error:
                     type: string
-                  errcode:
+                  errorcode:
                     type: integer
       description: |-
         Devices can submit the data to this endpoint. You need to specify the authentication mode you want to use to access APIs by setting `Auth-mode` header.
@@ -149,10 +149,6 @@ paths:
               properties:
                 reqId:
                   type: string
-            examples:
-              Device Heartbeat:
-                value:
-                  reqId: "unique-request-id"
   /v1/gateway/submitData:
     post:
       summary: Submit Data to Anedya through a Gateway
@@ -171,7 +167,7 @@ paths:
                     type: boolean
                   error:
                     type: string
-                  errcode:
+                  errorcode:
                     type: integer
       description: |-
         The devices acting as a gateway can submit the data to this endpoint for its child nodes. The child nodes need to be registered with the platform prior to data submission.
@@ -289,7 +285,7 @@ paths:
                     type: string
                     x-stoplight:
                       id: mgs1y368dex27
-                  errcode:
+                  errorcode:
                     type: integer
                     x-stoplight:
                       id: oav5z1x4thep4
@@ -376,6 +372,9 @@ paths:
                   serverSendTime:
                     type: integer
                     description: Server Send Time
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -398,6 +397,9 @@ paths:
         ```
 
       operationId: valuestore-getValue
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -458,9 +460,6 @@ paths:
                       - type: number
                   type:
                     type: string
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/valuestore/setValue:
     post:
       tags:
@@ -479,6 +478,9 @@ paths:
         ```
 
       operationId: valuestore-setValue
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -526,9 +528,6 @@ paths:
                     type: string
                   errorcode:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/valuestore/scan:
     post:
       tags:
@@ -546,6 +545,9 @@ paths:
         ```
 
       operationId: valuestore-scan
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -587,9 +589,6 @@ paths:
                     type: integer
                   next:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/valuestore/delete:
     post:
       tags:
@@ -607,6 +606,9 @@ paths:
         $anedya/device/{deviceid}/valuestore/delete/json
         ```
       operationId: valuestore-delete
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -633,9 +635,6 @@ paths:
                     type: string
                   errorcode:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/logs/submitLogs:
     post:
       tags:
@@ -651,6 +650,9 @@ paths:
         $anedya/device/{deviceid}/logs/submitLogs/json
         ```
       operationId: logs-submitLogs
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -706,6 +708,9 @@ paths:
         $anedya/device/{deviceid}/commands/next/json
         ```
       operationId: commands-next
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -751,9 +756,6 @@ paths:
                     type: string
                   updated:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/commands/list:
     post:
       tags:
@@ -775,6 +777,9 @@ paths:
         ```
 
       operationId: commands-list
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -826,9 +831,6 @@ paths:
                     type: integer
                   next:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/commands/updateStatus:
     post:
       tags:
@@ -852,6 +854,9 @@ paths:
         ```
 
       operationId: commands-updateStatus
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -884,9 +889,6 @@ paths:
                     type: string
                   errorcode:
                     type: string
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/commands/getDetails:
     post:
       tags:
@@ -902,6 +904,9 @@ paths:
         ```
 
       operationId: commands-getDetails
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -946,9 +951,6 @@ paths:
                       - failure
                   updated:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/ota/next:
     post:
       tags:
@@ -968,6 +970,17 @@ paths:
         ```
 
       operationId: v1-ota-next
+      security:
+        - Auth-mode: []
+          Authorization: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
       responses:
         "200":
           description: Returns an array of applicable deployments.
@@ -980,15 +993,12 @@ paths:
                     type: boolean
                   error:
                     type: string
-                  errcode:
+                  errorcode:
                     type: integer
                   data:
                     $ref: "#/components/schemas/DeviceDeploymentData"
                   count:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/ota/current:
     post:
       tags:
@@ -1004,6 +1014,9 @@ paths:
         $anedya/device/{deviceid}/ota/current/json
         ```
       operationId: v1-ota-current
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -1024,7 +1037,7 @@ paths:
                     type: boolean
                   error:
                     type: string
-                  errcode:
+                  errorcode:
                     type: integer
                   count:
                     type: integer
@@ -1032,10 +1045,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/CurrentDeploymentData"
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
-  /v1/ota/statusUpdate:
+  /v1/ota/updateStatus:
     post:
       tags:
         - Over The Air Updates
@@ -1056,6 +1066,9 @@ paths:
         $anedya/device/{deviceid}/ota/updateStatus/json
         ```
       operationId: v1-ota-statusUpdate
+      security:
+        - Auth-mode: []
+          Authorization: []
       requestBody:
         content:
           application/json:
@@ -1088,11 +1101,8 @@ paths:
                     type: boolean
                   error:
                     type: string
-                  errcode:
+                  errorcode:
                     type: integer
-      servers:
-        - url: device.<region>.anedya.io
-          description: Anedya Device Endpoint
   /v1/events/submit:
     post:
       summary: Submit Event
