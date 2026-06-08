@@ -1748,7 +1748,7 @@ paths:
   /streams/create:
     post:
       tags:
-        - Streams(Beta)
+        - Streams
       summary: Create a new stream
       description: Create a new stream which can be connected by end user client.
       operationId: streams-create
@@ -1805,7 +1805,7 @@ paths:
   /streams/delete:
     post:
       tags:
-        - Streams(Beta)
+        - Streams
       summary: Delete a stream
       description: Delete a stream
       operationId: streams-delete
