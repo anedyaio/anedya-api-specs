@@ -686,6 +686,63 @@ paths:
                               description: Unix timestamp of the last heartbeat received
       security:
         - Authorization: []
+  /health/stats:
+    post:
+      tags:
+        - Device Health
+      summary: Get device health statistics
+      description: |-
+        Retrieve health statistics (heartbeat counts) for a device starting from a specific time.
+      operationId: health-stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node:
+                  type: string
+                  format: uuid
+                  description: The unique identifier of the node to check health stats for
+                from:
+                  type: integer
+                  description: Unix timestamp from which to retrieve stats
+              required:
+                - node
+                - from
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        description: Array of heartbeat count statistics
+                        items:
+                          type: object
+                          properties:
+                            timestamp:
+                              type: integer
+                              description: Unix timestamp of the interval
+                            hbCount:
+                              type: integer
+                              description: Count of heartbeats received in the interval
+                      count:
+                        type: integer
+                        description: Total number of intervals returned
+                      startTime:
+                        type: integer
+                        description: Unix timestamp representing start of the range
+                      endTime:
+                        type: integer
+                        description: Unix timestamp representing end of the range
+      security:
+        - Authorization: []
   /data/getData:
     post:
       tags:
