@@ -686,6 +686,63 @@ paths:
                               description: Unix timestamp of the last heartbeat received
       security:
         - Authorization: []
+  /health/stats:
+    post:
+      tags:
+        - Device Health
+      summary: Get device health statistics
+      description: |-
+        Retrieve health statistics (heartbeat counts) for a device starting from a specific time.
+      operationId: health-stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node:
+                  type: string
+                  format: uuid
+                  description: The unique identifier of the node to check health stats for
+                from:
+                  type: integer
+                  description: Unix timestamp from which to retrieve stats
+              required:
+                - node
+                - from
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        description: Array of heartbeat count statistics
+                        items:
+                          type: object
+                          properties:
+                            timestamp:
+                              type: integer
+                              description: Unix timestamp of the interval
+                            hbCount:
+                              type: integer
+                              description: Count of heartbeats received in the interval
+                      count:
+                        type: integer
+                        description: Total number of intervals returned
+                      startTime:
+                        type: integer
+                        description: Unix timestamp representing start of the range
+                      endTime:
+                        type: integer
+                        description: Unix timestamp representing end of the range
+      security:
+        - Authorization: []
   /data/getData:
     post:
       tags:
@@ -1691,7 +1748,7 @@ paths:
   /streams/create:
     post:
       tags:
-        - Streams(Beta)
+        - Streams
       summary: Create a new stream
       description: Create a new stream which can be connected by end user client.
       operationId: streams-create
@@ -1710,21 +1767,34 @@ paths:
                       items:
                         type: string
                         format: uuid
+                      example:
+                        - "019e8d46-e895-713f-b763-6969b36e37a4"
+                  required:
+                    - nodes
                 events:
                   type: array
-                  items:
-                    type: string
                   description: List of the events which will be delivered in the stream. put `*` to receive all events.
+                  enum:
+                    - "valuestore::updates"
+                    - "valuestore::delete"
+                    - "events::nodeevents"
+                  example:
+                    - "valuestore::updates"
+                    - "valuestore::delete"
+                    - "events::nodeevents"
                 variables:
                   type: array
                   items:
                     type: string
                   description: List of the variables for which submitted data will be delivered in the stream. put `*` to receive all variables.
+                  example:
+                    - "temperature"
                 expiry:
                   type: integer
                   description: Expiry the stream in seconds from creation time. Default is 7 days. Maximum 1 year is allowed.
                   default: 604800
                   maximum: 31536000
+                  example: 86377
               required:
                 - sources
       responses:
@@ -1748,7 +1818,7 @@ paths:
   /streams/delete:
     post:
       tags:
-        - Streams(Beta)
+        - Streams
       summary: Delete a stream
       description: Delete a stream
       operationId: streams-delete
