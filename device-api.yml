@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: Device APIs
   version: "1.0"
-  description: "Please note that to access these APIs, two headers needs to be included in the request. Both of this headers are described below"
+  description: "To access these APIs, two headers must be included in the request: **Auth-mode** (set to `key`) and **Authorization** (set to your `<CONNECTION-KEY>`). Detailed descriptions for these headers are provided below."
 servers:
   - url: https://device.{region}.anedya.io
     description: Anedya Device Endpoint
@@ -1224,9 +1224,9 @@ components:
       name: Auth-mode
       type: apiKey
       in: header
-      description: The value can be either `key` or `tls` depending on the requirement. If the value is `tls` the Authorization header is not mandatory. In case of TLS based authentication priority is given to client certificate and request fails if same can not be verified.
+      description: The authentication mode. Must be set to `key` (for connection key authentication) or `tls` (for TLS client certificate authentication).
     Authorization:
       name: Authorization
       type: apiKey
       in: header
-      description: This header is mandatory only if `Auth-mode` is set to `key` and should contain the node connection key. For TLS authentication this header is ignored
+      description: This header contains the node connection key (e.g., `<CONNECTION-KEY>`). It is mandatory only if `Auth-mode` is set to `key`. For TLS authentication, this header is ignored.
