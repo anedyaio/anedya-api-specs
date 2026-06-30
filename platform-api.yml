@@ -1663,19 +1663,19 @@ paths:
                         type: string
       security:
         - Authorization: []
-  /commands/status:
+  /commands/getDetails:
     post:
       tags:
         - Commands
-      summary: Get current status of a command
-      operationId: command-status
+      summary: Get details of a command
+      operationId: command-details
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                id:
+                commandId:
                   type: string
       responses:
         2XX:
