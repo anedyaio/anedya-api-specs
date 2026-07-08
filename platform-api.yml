@@ -88,6 +88,9 @@ paths:
                     required:
                       - key
                       - value
+                preAuthorize:
+                  type: boolean
+                  description: Keep this flag `true` to preauthorize the node.
                 preauth_id:
                   type: string
                   description: Prequthorize a physical device to allow device connection. Please refer to provisioning flow for more details.
@@ -1660,19 +1663,19 @@ paths:
                         type: string
       security:
         - Authorization: []
-  /commands/status:
+  /commands/getDetails:
     post:
       tags:
         - Commands
-      summary: Get current status of a command
-      operationId: command-status
+      summary: Get details of a command
+      operationId: command-details
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                id:
+                commandId:
                   type: string
       responses:
         2XX:
