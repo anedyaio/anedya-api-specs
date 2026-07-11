@@ -997,8 +997,6 @@ paths:
                     type: integer
                   data:
                     $ref: "#/components/schemas/DeviceDeploymentData"
-                  count:
-                    type: integer
   /v1/ota/current:
     post:
       tags:
